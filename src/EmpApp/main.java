@@ -1,5 +1,6 @@
 package EmpApp;
 
+import EmpApp.config.*;
 import static EmpApp.config.connectDB;
 import employees.employees;
 import java.util.Scanner;
@@ -33,6 +34,8 @@ public class main {
                     employees emp = new employees();
                     emp.Employee();
                     break;
+             case 2:
+//                    String sql = "ALTER TABLE insect AUTO_INCREMENT = 5";
                     
                     
                     

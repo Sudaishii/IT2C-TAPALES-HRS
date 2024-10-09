@@ -4,11 +4,14 @@ package employees;
 import static EmpApp.config.connectDB;
 import EmpApp.config;
 import java.util.Scanner;
+import EmpApp.config.*;
 
 
 
    
 public class employees {
+    
+    
     
     public void addEmployees(){
          
@@ -40,22 +43,84 @@ public class employees {
     private void viewEmployees(){
         config cfg = new config();
         
-        String emp_details = "select * from tbl_employees";
-        String[] employeesColumns = {"emp_id", "emp_fname", "emp_lname", "emp_add", "emp_contantnum", "emp_title", "emp_hdate"};
-        String[] employeesHeaders = {"ID", "FIRST NAME", "LAST NAME", "ADDRESS", "CONTACT NUMBER", "JOB TITLE", "HIRE DATE"};
-        cfg.viewRecords(emp_details, employeesHeaders, employeesColumns);
+        String emp_dtls = "select * from tbl_employees";
+        String[] emp_hdrs = {"ID", "FIRST NAME", "LAST NAME", "ADDRESS", "CONTACT NUMBER", "JOB TITLE", "HIRE DATE"};
+         String[] emp_clmn = {"emp_id", "emp_fname", "emp_lname", "emp_add", "emp_contantnum", "emp_title", "emp_hdate"};
+        cfg.viewRecords(emp_dtls, emp_hdrs, emp_clmn);
         
     }
+    
+    public void updateEmployees() {
         
+         config cfg = new config();
+        
+        Scanner oha = new Scanner(System.in);
+        
+        System.out.print("Enter Employee ID: ");
+        int id = oha.nextInt();
+        
+        
+        System.out.print("Enter New Email Address: ");
+        String email = oha.next();
+        
+        System.out.print("Enter New Contact #: ");
+        String contact = oha.next();
+        
+        System.out.print("Enter New Job Title: ");
+        String title = oha.next();
+        
+
+        String sqlUpdate = "UPDATE tbl_employees SET emp_add = ?, emp_contantnum = ?, emp_title = ? WHERE emp_id = ?";
+
+
+       
+      
+      
+       cfg.updateEmployee(sqlUpdate, email, contact, title, id);
+    }
+    
+     public void deleteEmployees() {
+        Scanner sc = new Scanner(System.in);
+        config dbConfig = new config();
+
+        System.out.print("Enter the ID you want to delete: ");
+        int id = sc.nextInt();
+        
+        String sqlDelete = "DELETE FROM tbl_employees WHERE emp_id = ?";
+
+        config cfg = new config();
+        
+        cfg.deleteEmployees(sqlDelete, id);
+    }
+
+
+    
+    
+       
+//    public static void main(String[] args) {
+//        config dbConfig = new config();
+//
+//       
+//        String sqlDelete = "DELETE FROM students WHERE id = ?";
+//
+//  
+//        int studentIdToDelete = 1;
+//
+//        
+//        cfg.deleteEmployee(sqlDelete, studentIdToDelete);
+//    }
+
     
     public static void Employee(){
         
         Scanner sc = new Scanner(System.in);
         String choice;
-       
+        employees use = new employees();
+        
+        
       do{  
         
-        System.out.println("\nWelcome to Payslip App");
+        System.out.println("\nEmployee's Data... Loading...");
         System.out.println("--------------------------");
         System.out.println("1. ADD EMPLOYEE");
         System.out.println("2. VIEW EMPLOYEES");
@@ -70,21 +135,28 @@ public class employees {
         
         switch(actn){
             case 1:
-                employees add = new employees();
-                add.addEmployees();
+                
+                use.addEmployees();
                 break;
                 
             case 2:
-                employees view = new employees();
-                view.viewEmployees();
+                
+                use.viewEmployees();
                 break;
                 
             case 3: 
+                 use.viewEmployees();
+                 use.updateEmployees();
                 
+                 use.viewEmployees();
                 break;
                 
             case 4: 
+                use.viewEmployees();
+                use.deleteEmployees();
                 
+                use.viewEmployees();
+               
                 break;
                 
                 
@@ -98,4 +170,8 @@ public class employees {
         
       }while(1==1);
 }
+
+    
+
+
 }
