@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 
 public class config {
@@ -147,9 +148,21 @@ public class config {
     } catch (SQLException e) {
         System.out.println("Error deleting record: " + e.getMessage());
     }
+    
 }
         
-        
+     public boolean recordExists(String sql, int employeeId, LocalDate entryDate) {
+    try (Connection conn = connectDB(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setInt(1, employeeId);
+        pstmt.setObject(2, entryDate);
+        ResultSet rs = pstmt.executeQuery();
+        rs.next();
+        return rs.getInt(1) > 0;  
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}   
     
      
      

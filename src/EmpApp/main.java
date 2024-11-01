@@ -1,5 +1,6 @@
 package EmpApp;
 
+import DailyTimeRecords.Record;
 import EmpApp.config.*;
 import static EmpApp.config.connectDB;
 import employees.employees;
@@ -27,7 +28,7 @@ public class main {
 
         System.out.print("Enter Action: ");
         int act = oha.nextInt();
-
+           
          
          switch(act){
              case 1:
@@ -35,18 +36,18 @@ public class main {
                     emp.Employee();
                     break;
              case 2:
-//                    String sql = "ALTER TABLE insect AUTO_INCREMENT = 5";
-                    
+                    Record rcrd = new Record();
+                    rcrd.DailyTimeRecord();
                     
                     
                     
          }
          
-           System.out.print("Do you want to continue? (y:n): ");
-           choice = oha.next();
-         
-       }while(choice.equals("Y") || choice.equals("y"));
            
+         
+       }while(true);
+       
+          
     }
     
 }

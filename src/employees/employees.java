@@ -8,6 +8,7 @@ import EmpApp.config.*;
 
 
 
+
    
 public class employees {
     
@@ -46,7 +47,7 @@ public class employees {
 
     }
     
-    private void viewEmployees(){
+    public void viewEmployees(){
         config cfg = new config();
         
         String emp_dtls = "select * from tbl_employees";
@@ -168,13 +169,13 @@ public class employees {
                 
             case 5:
                 
-                break;
+               
       }
             
           System.out.print("Do you want to continue (y/n): ");
           choice = sc.next();
         
-      }while(1==1);
+      }while(choice.equals("Y") || choice.equals("y"));
 }
 
     
