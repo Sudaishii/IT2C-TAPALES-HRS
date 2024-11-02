@@ -151,6 +151,51 @@ public class config {
     
 }
         
+        public void viewRecordsV2(String sqlQuery, String[] columnHeaders, String[] columnNames, int employeeId) {
+        
+        if (columnHeaders.length != columnNames.length) {
+            System.out.println("Error: Mismatch between column headers and column names.");
+            return;
+        }
+
+       
+        try (Connection conn = this.connectDB();
+             PreparedStatement pstmt = conn.prepareStatement(sqlQuery)) {
+             
+            
+            pstmt.setInt(1, employeeId);
+            
+           
+            ResultSet rs = pstmt.executeQuery();
+
+            
+            StringBuilder headerLine = new StringBuilder();
+            headerLine.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
+            for (String header : columnHeaders) {
+                headerLine.append(String.format("%-24s | ", header)); 
+            }
+            headerLine.append("\n---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            
+            
+            System.out.println(headerLine.toString());
+
+            
+            while (rs.next()) {
+                StringBuilder row = new StringBuilder("| ");
+                for (String colName : columnNames) {
+                    String value = rs.getString(colName);
+                    row.append(String.format("%-24s | ", value != null ? value : ""));
+                }
+                System.out.println(row.toString());
+            }
+            System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving records: " + e.getMessage());
+        }
+    }
+
+        
      public boolean recordExists(String sql, int employeeId, LocalDate entryDate) {
     try (Connection conn = connectDB(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
         pstmt.setInt(1, employeeId);
