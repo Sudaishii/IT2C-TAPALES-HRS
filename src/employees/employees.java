@@ -127,15 +127,20 @@ public class employees {
         
       do{  
         
-        System.out.println("\nEmployee's Data... Loading...");
-        System.out.println("--------------------------");
-        System.out.println("1. ADD EMPLOYEE");
-        System.out.println("2. VIEW EMPLOYEES");
-        System.out.println("3. UPDATE EMPLOYEE");
-        System.out.println("4. DELETE EMPLOYEE");
-        System.out.println("5. EXIT");
-        System.out.println("--------------------------");
-        
+            System.out.println();
+            System.out.println("***********************************************");
+            System.out.println("*           Employee Management               *");
+            System.out.println("***********************************************");
+            System.out.println();
+            System.out.println("1. Add Employee");
+            System.out.println("2. View Employees");
+            System.out.println("3. Update Employee");
+            System.out.println("4. Delete Employee");
+            System.out.println("5. Exit");
+            System.out.println();
+            System.out.println("***********************************************");
+            System.out.println();
+    
           System.out.print("Enter Action: ");
           int actn = sc.nextInt();
 //          while() VALIDATION
@@ -161,13 +166,16 @@ public class employees {
             case 4: 
                 use.viewEmployees();
                 use.deleteEmployees();
-                
                 use.viewEmployees();
-               
                 break;
                 
                 
             case 5:
+                return;
+            
+            default: 
+                System.out.print("Invalid Selection!");
+                return;
                 
                
       }
@@ -176,6 +184,8 @@ public class employees {
           choice = sc.next();
         
       }while(choice.equals("Y") || choice.equals("y"));
+      
+      
 }
 
     

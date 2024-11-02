@@ -89,7 +89,7 @@ public class Record {
         System.out.print("Enter Employee ID: ");
         int id = sc.nextInt();
         String record_dtls = "select * from DailyTimeRecords where employee_id = ?";
-        String[] dtr_hdrs = {"Record ID", "Employee ID", "Entry Date", "Time In", "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent"};
+        String[] dtr_hdrs = {"Record ID", "Employee ID", "Entry Date", "Time In", "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"};
         String[] dtr_clmn = {"record_id", "employee_id", "entry_date", "time_in", "time_out", "month", "hours_worked", "overtime_hrs", "absent"};
         cfg.viewRecordsV2(record_dtls, dtr_hdrs, dtr_clmn, id);
         
@@ -101,18 +101,63 @@ public class Record {
      
    
        viewRecords();
+       
+         System.out.print("Do you want to Filter (Employee ID) (y/n): ");
+         String opt = sc.nextLine();
+         int rid, h_worked, ovTime;
+        String timein, timeout, absent;
+        String sqlUpdate = "UPDATE DailyTimeRecords SET absent = ?, time_in = ?, time_out = ?, hours_worked = ?, overtime_hrs = ? WHERE record_id = ?";
         
-       System.out.print("Enter What Record you want to Update: ");
-       int rid = sc.nextInt();
+       
+                
+         switch(opt){
+             
+                 case "y":
+                 case "Y":
+                     System.out.print("Enter What Record ID you want to Update: ");
+                     rid = sc.nextInt();
+        
+       
+       
+                System.out.print("Is the Employee Absent? (Yes || No):  ");
+                String absnt = sc.next();
+                
+
+                if (absnt.equals("Yes") || absnt.equals("yes") ){
+                    timein = "";
+                    timeout = "";
+                    h_worked = 0;
+                    ovTime = 0;
+                }
+
+                else{   
+
+                    System.out.print("Time In: ");
+                    timein = sc.next();
+                    System.out.print("Time Out: ");
+                    timeout = sc.next();
+                    System.out.print("Total Hours Worked: ");
+                    h_worked = sc.nextInt();
+                    System.out.print("Total Over Time Hours: ");
+                    ovTime = sc.nextInt();
+
+                }
+
+                
+
+               cfg.updateEmployee(sqlUpdate, absnt, timein, timeout, h_worked, ovTime, rid);
+                     break;
+                     
+                 case "N":
+                 case "n":
+                     System.out.print("Enter What Record ID you want to Update: ");
+                     rid = sc.nextInt();
         
        
        
         System.out.print("Is the Employee Absent? (Yes || No):  ");
-        String absnt = sc.next();
-        String timein;
-        String timeout;
-        int h_worked;
-        int ovTime;
+        absnt = sc.next();
+        
         
         if (absnt.equals("Yes") || absnt.equals("yes") ){
             timein = "";
@@ -134,28 +179,39 @@ public class Record {
         
         }
        
-        String sqlUpdate = "UPDATE DailyTimeRecords SET absent = ?, time_in = ?, time_out = ?, hours_worked = ?, overtime_hrs = ? WHERE record_id = ?";
+        
         
        cfg.updateEmployee(sqlUpdate, absnt, timein, timeout, h_worked, ovTime, rid);
+                     break;
+         }
+         
+         
     }
     
     public void DailyTimeRecord(){
+        
         Scanner sc = new Scanner(System.in);
         String choice;
         employees use = new employees();
         
-          System.out.println("\n Daily Time Record");
-          System.out.println("--------------------------");
-          System.out.println("1. Add Daily Time Record");
-          System.out.println("2. View Daily Time Record");
-          System.out.println("3. Update Daily Time Record");
-          System.out.println("4. Delete Daily Time Record");
-          System.out.println("5. Exit");
-          System.out.println("--------------------------");  
-          
+            System.out.println();
+            System.out.println("***********************************************");
+            System.out.println("*             Daily Time Record               *");
+            System.out.println("***********************************************");
+            System.out.println();
+            System.out.println("1. Add Daily Time Record");
+            System.out.println("2. View Daily Time Record");
+            System.out.println("3. Update Daily Time Record");
+            System.out.println("4. Delete Daily Time Record");
+            System.out.println("5. Exit");
+            System.out.println();
+            System.out.println("***********************************************");
+            System.out.println();
+            
+            
             System.out.print("Enter Action: ");
             int actn = sc.nextInt();
-            //Validation
+           
         
         switch(actn){
             
@@ -166,6 +222,7 @@ public class Record {
                 break;
             
             case 2:
+                System.out.print("Daily Time Records Loaded . . .");
                 viewRecord();
                 break;
                
@@ -174,6 +231,8 @@ public class Record {
                 updateRecord();
                 return;
             case 4:
+                
+            case 5:
                 System.out.println("Going back to main menu . . .");
                 return;
             default:

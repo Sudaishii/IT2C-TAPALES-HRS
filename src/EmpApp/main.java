@@ -26,7 +26,6 @@ public class main {
         System.out.println("*                                             *");
         System.out.println("***********************************************");
         System.out.println();
-        
         System.out.println("Please select an option:");
         System.out.println();
         System.out.println("   1. Employees");
@@ -48,6 +47,7 @@ public class main {
              case 2:
                     Record rcrd = new Record();
                     rcrd.DailyTimeRecord();
+                    break;
              case 3:
                  break;
                     

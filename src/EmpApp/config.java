@@ -16,9 +16,8 @@ public class config {
       public static Connection connectDB() {
         Connection con = null;
         try {
-            Class.forName("org.sqlite.JDBC"); // Load the SQLite JDBC driver
-            con = DriverManager.getConnection("jdbc:sqlite:sheed.db"); // Establish connection
-            System.out.println("Connection Successful");
+            Class.forName("org.sqlite.JDBC"); 
+            con = DriverManager.getConnection("jdbc:sqlite:sheed.db"); 
         } catch (Exception e) {
             System.out.println("Connection Failed: " + e);
         }
