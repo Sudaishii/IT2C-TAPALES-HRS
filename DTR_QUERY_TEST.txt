@@ -1,0 +1,154 @@
+delete from your_table;    
+delete from sqlite_sequence where name='your_table';
+
+ Human Resources (HR)
+HR Assistant
+HR Coordinator
+HR Manager
+Recruiter
+Training Specialist
+2. Finance
+Accounting Clerk
+Accountant
+Financial Analyst
+Payroll Specialist
+Finance Manager
+3. Marketing
+Marketing Assistant
+Content Specialist
+Social Media Coordinator
+Marketing Manager
+Brand Strategist
+4. Sales
+Sales Representative
+Sales Associate
+Account Executive
+Sales Manager
+Business Development Officer
+5. Operations
+Operations Assistant
+Logistics Coordinator
+Operations Analyst
+Inventory Manager
+Operations Manager
+6. Information Technology (IT)
+IT Support Specialist
+System Administrator
+Network Engineer
+Software Developer
+IT Manager
+7. Customer Service
+Customer Service Representative
+Customer Support Specialist
+Help Desk Technician
+Client Relations Associate
+Customer Service Manager
+8. Research and Development (R&D)
+Research Assistant
+Product Developer
+Lab Technician
+R&D Scientist
+R&D Manager
+9. Product Management
+Product Assistant
+Product Analyst
+Product Designer
+Product Manager
+Product Development Lead
+10. Legal
+Legal Assistant
+Paralegal
+Compliance Specialist
+Contracts Manager
+Legal Counsel
+11. Administrative
+Receptionist
+Administrative Assistant
+Office Coordinator
+Executive Assistant
+Office Manager
+12. Executive
+Executive Assistant
+Chief Executive Officer (CEO)
+Chief Financial Officer (CFO)
+Chief Operations Officer (COO)
+Director of Operations
+
+
+
+INSERT INTO DailyTimeRecords 
+(employee_id, entry_date, time_in, time_out, month, hours_worked, overtime_hrs, absent)
+VALUES
+(1001, '2024-10-01', '09:00:00', '17:00:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-02', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-03', '09:15:00', '17:15:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-04', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),
+(1001, '2024-10-07', '09:30:00', '18:00:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-08', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-09', '09:05:00', '17:10:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-10', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),
+(1001, '2024-10-11', '09:20:00', '17:20:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-14', '09:00:00', '17:00:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-15', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),
+(1001, '2024-10-16', '09:10:00', '17:15:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-17', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-18', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),
+(1001, '2024-10-21', '09:00:00', '17:00:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-22', '09:15:00', '17:15:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-23', '09:05:00', '17:05:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-24', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),
+(1001, '2024-10-25', '09:00:00', '17:30:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-28', '09:30:00', '18:00:00', 'OCTOBER', 8, 1, 'No'),
+(1001, '2024-10-29', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1001, '2024-10-30', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),
+(1001, '2024-10-31', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+
+
+(1002, '2024-10-01', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-02', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-03', '09:30:00', '17:30:00', 'OCTOBER', 8, 1, 'No'),
+(1002, '2024-10-04', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),  
+(1002, '2024-10-07', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-08', '09:15:00', '17:15:00', 'OCTOBER', 8, 1, 'No'),
+(1002, '2024-10-09', '09:05:00', '17:10:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-10', NULL, NULL, 'OCTOBER', 0, 0, 'No'),  
+(1002, '2024-10-11', '09:20:00', '17:20:00', 'OCTOBER', 8, 1, 'No'),
+(1002, '2024-10-14', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-15', NULL, NULL, 'OCTOBER', 0, 0, 'No'), 
+(1002, '2024-10-16', '09:10:00', '17:15:00', 'OCTOBER', 8, 1, 'No'),
+(1002, '2024-10-17', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-18', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),  
+(1002, '2024-10-21', '09:00:00', '17:00:00', 'OCTOBER', 8, 1, 'No'),
+(1002, '2024-10-22', '09:15:00', '17:15:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-23', '09:05:00', '17:05:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-24', NULL, NULL, 'OCTOBER', 0, 0, 'No'),  
+(1002, '2024-10-25', '09:00:00', '17:30:00', 'OCTOBER', 8, 1, 'No'),
+(1002, '2024-10-28', '09:30:00', '18:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-29', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1002, '2024-10-30', NULL, NULL, 'OCTOBER', 0, 0, 'No'),  
+(1002, '2024-10-31', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+
+
+(1003, '2024-10-01', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-02', '09:15:00', '17:15:00', 'OCTOBER', 8, 1, 'No'),
+(1003, '2024-10-03', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-04', NULL, NULL, 'OCTOBER', 0, 0, 'No'),  
+(1003, '2024-10-07', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-08', '09:30:00', '18:00:00', 'OCTOBER', 8, 1, 'No'),
+(1003, '2024-10-09', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),  
+(1003, '2024-10-10', '09:05:00', '17:05:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-11', '09:20:00', '17:20:00', 'OCTOBER', 8, 1, 'No'),
+(1003, '2024-10-14', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'), 
+(1003, '2024-10-15', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-16', '09:10:00', '17:15:00', 'OCTOBER', 8, 1, 'No'),
+(1003, '2024-10-17', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-18', NULL, NULL, 'OCTOBER', 0, 0, 'No'), 
+(1003, '2024-10-21', '09:00:00', '17:00:00', 'OCTOBER', 8, 1, 'No'),
+(1003, '2024-10-22', '09:15:00', '17:15:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-23', '09:05:00', '17:05:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-24', NULL, NULL, 'OCTOBER', 0, 0, 'No'),  
+(1003, '2024-10-25', '09:00:00', '17:30:00', 'OCTOBER', 8, 1, 'No'),
+(1003, '2024-10-28', '09:30:00', '18:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-29', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No'),
+(1003, '2024-10-30', NULL, NULL, 'OCTOBER', 0, 0, 'Yes'),  
+(1003, '2024-10-31', '09:00:00', '17:00:00', 'OCTOBER', 8, 0, 'No');

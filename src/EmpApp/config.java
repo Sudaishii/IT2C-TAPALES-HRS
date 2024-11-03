@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Scanner;
 
 
 public class config {
@@ -72,11 +73,11 @@ public class config {
 
             
             StringBuilder headerLine = new StringBuilder();
-            headerLine.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
+            headerLine.append("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
             for (String header : columnHeaders) {
-                headerLine.append(String.format("%-24s | ", header)); 
+                headerLine.append(String.format("%-30s | ", header)); 
             }
-            headerLine.append("\n---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            headerLine.append("\n-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
             System.out.println(headerLine.toString());
 
@@ -85,11 +86,11 @@ public class config {
                 StringBuilder row = new StringBuilder("| ");
                 for (String colName : columnNames) {
                     String value = rs.getString(colName);
-                    row.append(String.format("%-24s | ", value != null ? value : ""));
+                    row.append(String.format("%-30s | ", value != null ? value : ""));
                 }
                 System.out.println(row.toString());
             }
-            System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
         } catch (SQLException e) {
             System.out.println("Error retrieving records: " + e.getMessage());
@@ -123,7 +124,7 @@ public class config {
             }
 
             pstmt.executeUpdate();
-            System.out.println("Record updated successfully!");
+            System.out.println("Record updated successfully!\n\n");
         } catch (SQLException e) {
             System.out.println("Error updating record: " + e.getMessage());
         }
@@ -208,34 +209,12 @@ public class config {
     return false;
 }   
     
-     
-     
-     
-      
-//    
-      
-    
-//      
-//      public void addRecord(String sql, String... values) {
-//        try (Connection conn = this.connectDB(); // Use the connectDB method
-//             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//
-//            // Loop through the values and set them in the prepared statement
-//            for (int i = 0; i < values.length; i++) {
-//                pstmt.setString(i + 1, values[i]); // PreparedStatement index starts at 1
-//            }
-//
-//            pstmt.executeUpdate();
-//            System.out.println("Record added successfully!");
-//        } catch (SQLException e) {
-//            System.out.println("Error adding record: " + e.getMessage());
-//        }
-//}
-
+        
+    }
 
     
       
 
 
       
-}
+

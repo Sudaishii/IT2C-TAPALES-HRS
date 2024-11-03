@@ -84,10 +84,14 @@ public class Record {
     }
     
     public void viewRecords(){
+        
         config cfg = new config();
         
-        System.out.print("Enter Employee ID: ");
+        
+        
+        System.out.print("Enter the Employee's ID you want to Filter: ");
         int id = sc.nextInt();
+        
         String record_dtls = "select * from DailyTimeRecords where employee_id = ?";
         String[] dtr_hdrs = {"Record ID", "Employee ID", "Entry Date", "Time In", "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"};
         String[] dtr_clmn = {"record_id", "employee_id", "entry_date", "time_in", "time_out", "month", "hours_worked", "overtime_hrs", "absent"};
@@ -100,11 +104,11 @@ public class Record {
        config cfg = new config();
      
    
-       viewRecords();
        
-         System.out.print("Do you want to Filter (Employee ID) (y/n): ");
-         String opt = sc.nextLine();
-         int rid, h_worked, ovTime;
+       
+        System.out.print("Do you want to Filter Records for (Employee ID) (y/n): ");
+        String opt = sc.nextLine();
+        int rid, h_worked, ovTime;
         String timein, timeout, absent;
         String sqlUpdate = "UPDATE DailyTimeRecords SET absent = ?, time_in = ?, time_out = ?, hours_worked = ?, overtime_hrs = ? WHERE record_id = ?";
         
@@ -114,9 +118,13 @@ public class Record {
              
                  case "y":
                  case "Y":
-                     System.out.print("Enter What Record ID you want to Update: ");
-                     rid = sc.nextInt();
-        
+           
+                     
+                 viewRecords();
+                     
+                 System.out.print("Enter What Record ID you want to Update: ");
+                 rid = sc.nextInt();
+                     
        
        
                 System.out.print("Is the Employee Absent? (Yes || No):  ");
@@ -128,10 +136,11 @@ public class Record {
                     timeout = "";
                     h_worked = 0;
                     ovTime = 0;
+                    absent = "Yes";
                 }
 
                 else{   
-
+                    absent = "No";
                     System.out.print("Time In: ");
                     timein = sc.next();
                     System.out.print("Time Out: ");
@@ -150,10 +159,10 @@ public class Record {
                      
                  case "N":
                  case "n":
+                  
                      System.out.print("Enter What Record ID you want to Update: ");
                      rid = sc.nextInt();
         
-       
        
         System.out.print("Is the Employee Absent? (Yes || No):  ");
         absnt = sc.next();
@@ -164,10 +173,11 @@ public class Record {
             timeout = "";
             h_worked = 0;
             ovTime = 0;
+            absent = "Yes";
         }
         
         else{   
-            
+            absent = "No";
             System.out.print("Time In: ");
             timein = sc.next();
             System.out.print("Time Out: ");
@@ -187,6 +197,37 @@ public class Record {
          
          
     }
+     
+     
+     public void deleteRecord() {
+         
+        Scanner sc = new Scanner(System.in);
+        config dbConfig = new config();
+        
+        System.out.print("Do you want to Filter Records for (Employee ID) (y/n): ");
+        String chc = sc.nextLine();
+        
+        if (chc.equals("y") || chc.equals("Y")){
+                   
+                   viewRecords();
+               
+               }
+               else if (chc.equals("n") || chc.equals("N")){
+                   
+                   viewRecord();
+                   
+               }
+        
+        System.out.print("Enter the Record ID you want to delete: ");
+        int id = sc.nextInt();
+        
+        String sqlDelete = "DELETE FROM DailyTimeRecords WHERE record_id = ?";
+
+        config cfg = new config();
+        
+        cfg.deleteEmployees(sqlDelete, id);
+    }
+     
     
     public void DailyTimeRecord(){
         
@@ -194,13 +235,16 @@ public class Record {
         String choice;
         employees use = new employees();
         
+        
+        do{
+        
             System.out.println();
             System.out.println("***********************************************");
             System.out.println("*             Daily Time Record               *");
             System.out.println("***********************************************");
             System.out.println();
             System.out.println("1. Add Daily Time Record");
-            System.out.println("2. View Daily Time Record");
+            System.out.println("2. View Daily Time Records");
             System.out.println("3. Update Daily Time Record");
             System.out.println("4. Delete Daily Time Record");
             System.out.println("5. Exit");
@@ -211,6 +255,7 @@ public class Record {
             
             System.out.print("Enter Action: ");
             int actn = sc.nextInt();
+            sc.nextLine();
            
         
         switch(actn){
@@ -222,15 +267,31 @@ public class Record {
                 break;
             
             case 2:
-                System.out.print("Daily Time Records Loaded . . .");
-                viewRecord();
+                
+               System.out.print("Do you want to Filter Records for (Employee ID) (y/n): ");
+               String chc = sc.nextLine();
+                
+               if (chc.equals("y") || chc.equals("Y")){
+                   
+                   viewRecords();
+               
+               }
+               else if (chc.equals("n") || chc.equals("N")){
+                   
+                   viewRecord();
+                   
+               }
                 break;
                
             case 3:
                 viewRecord();
                 updateRecord();
                 return;
+                
             case 4:
+                viewEmployees();
+                deleteRecord();
+                break;
                 
             case 5:
                 System.out.println("Going back to main menu . . .");
@@ -239,8 +300,13 @@ public class Record {
                 System.out.print("Error Selection!");
             
         }
-    
-          return;
+            
+            System.out.print("Do you want to continue (y/n): ");
+            choice = sc.next();
+        
+        }while(choice.equals("Y") || choice.equals("y"));
+        
+        return;
      
     }
     
