@@ -150,7 +150,7 @@ public class Reports {
         do {
             System.out.println();
             System.out.println("***********************************************");
-            System.out.println("*             Daily Time Record               *");
+            System.out.println("*               Payslip Reports               *");
             System.out.println("***********************************************");
             System.out.println();
 

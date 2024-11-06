@@ -151,36 +151,35 @@ public class config {
     
 }
         
-        public void viewRecordsV2(String sqlQuery, String[] columnHeaders, String[] columnNames, int employeeId) {
-        
+         public void viewRecordsV2(String sqlQuery, String[] columnHeaders, String[] columnNames, int employeeId, String month) {
         if (columnHeaders.length != columnNames.length) {
             System.out.println("Error: Mismatch between column headers and column names.");
             return;
         }
 
-       
         try (Connection conn = this.connectDB();
              PreparedStatement pstmt = conn.prepareStatement(sqlQuery)) {
-             
-            
+
+            // Set the parameters for employee ID and month
             pstmt.setInt(1, employeeId);
-            
-           
+            pstmt.setString(2, month);
+
+            // Execute the query
             ResultSet rs = pstmt.executeQuery();
 
-            
+            // Print headers
             StringBuilder headerLine = new StringBuilder();
             headerLine.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
             for (String header : columnHeaders) {
                 headerLine.append(String.format("%-24s | ", header)); 
             }
             headerLine.append("\n---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-            
-            
             System.out.println(headerLine.toString());
 
-            
+            // Print records
+            boolean found = false;  // Flag to check if any records are found
             while (rs.next()) {
+                found = true;
                 StringBuilder row = new StringBuilder("| ");
                 for (String colName : columnNames) {
                     String value = rs.getString(colName);
@@ -188,6 +187,11 @@ public class config {
                 }
                 System.out.println(row.toString());
             }
+            
+            if (!found) {
+                System.out.println("| No records found for this employee in " + month + " |");
+            }
+
             System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
         } catch (SQLException e) {
@@ -209,10 +213,46 @@ public class config {
     return false;
 }   
     
-     
+     public void viewRecordsEmp(String sqlQuery, String[] columnHeaders, String[] columnNames) {
+      
+        if (columnHeaders.length != columnNames.length) {
+            System.out.println("Error: Mismatch between column headers and column names.");
+            return;
+        }
+
+        try (Connection conn = this.connectDB();
+             PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            
+            StringBuilder headerLine = new StringBuilder();
+            headerLine.append("-------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
+            for (String header : columnHeaders) {
+                headerLine.append(String.format("%-30s | ", header)); 
+            }
+            headerLine.append("\n-------------------------------------------------------------------------------------------------------------------------------------------------");
+
+            System.out.println(headerLine.toString());
+
+           
+            while (rs.next()) {
+                StringBuilder row = new StringBuilder("| ");
+                for (String colName : columnNames) {
+                    String value = rs.getString(colName);
+                    row.append(String.format("%-30s | ", value != null ? value : ""));
+                }
+                System.out.println(row.toString());
+            }
+            System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving records: " + e.getMessage());
+        }
+     }    
      
         
     }
+
 
     
       

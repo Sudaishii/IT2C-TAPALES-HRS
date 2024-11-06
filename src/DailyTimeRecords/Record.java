@@ -11,6 +11,7 @@ import employees.employees;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 
 /**
  *
@@ -73,13 +74,13 @@ public class Record {
         
     }
     
-    public void viewEmployees(){
+    public void viewEmployeesv2(){
         config cfg = new config();
         
         String emp_dtls = "select * from tbl_employees";
         String[] emp_hdrs = {"ID", "FIRST NAME", "LAST NAME"};
          String[] emp_clmn = {"emp_id", "emp_fname", "emp_lname"};
-        cfg.viewRecords(emp_dtls, emp_hdrs, emp_clmn);
+        cfg.viewRecordsEmp(emp_dtls, emp_hdrs, emp_clmn);
         
     }
     
@@ -87,17 +88,56 @@ public class Record {
         
         config cfg = new config();
         
-        
-        
-        System.out.print("Enter the Employee's ID you want to Filter: ");
-        int id = sc.nextInt();
-        
-        String record_dtls = "select * from DailyTimeRecords where employee_id = ?";
-        String[] dtr_hdrs = {"Record ID", "Employee ID", "Entry Date", "Time In", "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"};
-        String[] dtr_clmn = {"record_id", "employee_id", "entry_date", "time_in", "time_out", "month", "hours_worked", "overtime_hrs", "absent"};
-        cfg.viewRecordsV2(record_dtls, dtr_hdrs, dtr_clmn, id);
-        
+
+        Scanner sc = new Scanner(System.in);
+
+    
+        try {
+            
+            System.out.print("Enter the Employee's ID you want to Sort: ");
+            int id = sc.nextInt();  // Employee ID input
+            
+            
+            sc.nextLine();  
+
+           
+            System.out.print("Enter the Month you want to Sort (Must be Uppercase): ");
+            String month = sc.nextLine().trim();  
+
+            
+            String record_dtls = "SELECT * FROM DailyTimeRecords WHERE employee_id = ? AND month = ?";
+
+           
+            String[] dtr_hdrs = {
+                "Record ID", "Employee ID", "Entry Date", "Time In", 
+                "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"
+            };
+
+          
+            String[] dtr_clmn = {
+                "record_id", "employee_id", "entry_date", "time_in", 
+                "time_out", "month", "hours_worked", "overtime_hrs", "absent"
+            };
+
+           
+            cfg.viewRecordsV2(record_dtls, dtr_hdrs, dtr_clmn, id, month);
+
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+            System.out.println("An error occurred while fetching records. Please try again.");
+        }
     }
+
+    // Utility method to capitalize the first letter of the month and make the rest lowercase
+    private String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;  // Handle empty or null input
+        }
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+    }
+
+    
     
      public void updateRecord() {
         
@@ -261,26 +301,15 @@ public class Record {
         switch(actn){
             
             case 1:
-                viewEmployees();
+                viewEmployeesv2();
                 System.out.print("\n\n");
                 AddDTR();
                 break;
             
             case 2:
-                
-               System.out.print("Do you want to Filter Records for (Employee ID) (y/n): ");
-               String chc = sc.nextLine();
-                
-               if (chc.equals("y") || chc.equals("Y")){
-                   
+                   viewEmployeesv2();
                    viewRecords();
-               
-               }
-               else if (chc.equals("n") || chc.equals("N")){
-                   
-                   viewRecord();
-                   
-               }
+             
                 break;
                
             case 3:
@@ -289,7 +318,7 @@ public class Record {
                 return;
                 
             case 4:
-                viewEmployees();
+                viewEmployeesv2();
                 deleteRecord();
                 break;
                 
