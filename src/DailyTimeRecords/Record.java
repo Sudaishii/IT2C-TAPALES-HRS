@@ -1,68 +1,166 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DailyTimeRecords;
 
 
 import EmpApp.config;
 import employees.employees;
+import java.time.Duration;
 import java.util.Scanner;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
-/**
- *
- * @author Snezhy
- */
+
 public class Record {
         
     Scanner sc = new Scanner(System.in);
     
-    public void AddDTR(){
-        
-        config cfg = new config();
-        
-        System.out.print("Enter Employee's ID: ");
-        String id = sc.next();
-        System.out.print("Enter Entry Date (yyyy-MM-dd): ");
-        String entrydate = sc.next();
-        LocalDate date = LocalDate.parse(entrydate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String month = date.getMonth().toString(); 
-        System.out.print("Is the Employee Absent? (Yes || No):  ");
-        String absnt = sc.next();
-        String timein;
-        String timeout;
-        int h_worked;
-        int ovTime;
-        
-        if (absnt.equals("Yes") || absnt.equals("yes") ||  absnt.equals('y') || absnt.equals('Y') ){
-            timein = "";
-            timeout = "";
-            h_worked = 0;
-            ovTime = 0;
-        }
-        
-        else{   
-            
-            System.out.print("Time In: ");
-            timein = sc.next();
-            System.out.print("Time Out: ");
-            timeout = sc.next();
-            System.out.print("Total Hours Worked: ");
-            h_worked = sc.nextInt();
-            System.out.print("Total Over Time Hours: ");
-            ovTime = sc.nextInt();
-        
-        }
-        
-        String sql = "INSERT INTO DailyTimeRecords (employee_id, entry_date, month, absent, time_in, time_out, hours_worked, overtime_hrs) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+  public void AddDTR() {
+    Scanner sc = new Scanner(System.in);
+    config cfg = new config();
 
-        cfg.addRecord(sql, id, entrydate, month, absnt, timein, timeout, h_worked, ovTime);
-      
+    System.out.print("Enter Employee's ID: ");
+    String id = sc.next();
+    System.out.print("Enter Entry Date (yyyy-MM-dd): ");
+    String entrydate = sc.next();
+    LocalDate date = LocalDate.parse(entrydate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    String month = date.getMonth().toString();
+    
+    System.out.print("Is the Employee Absent? (Yes || No):  ");
+    String absnt = sc.next();
+    
+  
+    String timein = "";
+    String timeout = "";
+    int h_worked = 0;
+    int ovTime = 0;
+
+    if (absnt.equalsIgnoreCase("No") || absnt.equalsIgnoreCase("n")) {
+        
+        
+        LocalTime minTimeIn = LocalTime.of(8, 0);
+        LocalTime maxTimeIn = LocalTime.of(22, 0); 
+
+       
+        LocalTime timeIn = null;
+        while (timeIn == null) {
+            try {
+                System.out.print("Time In (HH:mm): ");
+                timein = sc.next();
+                timeIn = LocalTime.parse(timein, DateTimeFormatter.ofPattern("HH:mm"));
+
+              
+                if (timeIn.isBefore(minTimeIn) || timeIn.isAfter(maxTimeIn)) {
+                    System.out.println("Invalid Time In. Please enter a time between 08:00 and 22:00.");
+                    timeIn = null;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid format. Please enter time in HH:mm format.");
+            }
+        }
+
+       
+        LocalTime timeOut = null;
+        while (timeOut == null) {
+            try {
+                System.out.print("Time Out (HH:mm): ");
+                timeout = sc.next();
+                timeOut = LocalTime.parse(timeout, DateTimeFormatter.ofPattern("HH:mm"));
+                
+            
+                if (timeOut.isBefore(minTimeIn) || timeOut.isAfter(maxTimeIn)) {
+                    System.out.println("Invalid Time Out. Please enter a time between 08:00 and 22:00.");
+                    timeOut = null; 
+                }
+               
+                if (timeout.equals("24:00")) {
+                    timeOut = LocalTime.of(0, 0);
+                }
+
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid format. Please enter time in (HH:mm | 24 HOUR) format.");
+            }
+        }
+
+     
+        Duration workedDuration = Duration.between(timeIn, timeOut);
+        h_worked = (int) workedDuration.toHours();
+        int remainingMinutes = (int) workedDuration.toMinutes() % 60;
+
+
+        if (h_worked < 0) {
+            System.out.println("Time Out cannot be earlier than Time In. Please check the times entered.");
+            return;
+        }
+
+        System.out.println("Total Hours Worked: " + h_worked + " hours and " + remainingMinutes + " minutes");
+
+    
+        int standardHours = 8;
+
+  
+        if (h_worked > standardHours) {
+            ovTime = h_worked - standardHours; 
+        }
+
+    
+        System.out.println("Total Over Time Hours: " + ovTime);
     }
+
+   
+    String sql = "INSERT INTO DailyTimeRecords (employee_id, entry_date, month, absent, time_in, time_out, hours_worked, overtime_hrs) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    cfg.addRecord(sql, id, entrydate, month, absnt, timein, timeout, h_worked, ovTime);
+}
+
+
+
+    
+    
+//    public void AddDTR(){
+//        
+//        config cfg = new config();
+//        
+//        System.out.print("Enter Employee's ID: ");
+//        String id = sc.next();
+//        System.out.print("Enter Entry Date (yyyy-MM-dd): ");
+//        String entrydate = sc.next();
+//        LocalDate date = LocalDate.parse(entrydate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//        String month = date.getMonth().toString(); 
+//        System.out.print("Is the Employee Absent? (Yes || No):  ");
+//        String absnt = sc.next();
+//        String timein;
+//        String timeout;
+//        int h_worked;
+//        int ovTime;
+//        
+//        if (absnt.equals("Yes") || absnt.equals("yes") ||  absnt.equals('y') || absnt.equals('Y') ){
+//            timein = "";
+//            timeout = "";
+//            h_worked = 0;
+//            ovTime = 0;
+//        }
+//        
+//        else{   
+//            
+//            System.out.print("Time In: ");
+//            timein = sc.next();
+//            System.out.print("Time Out: ");
+//            timeout = sc.next();
+//            System.out.print("Total Hours Worked: ");
+//            h_worked = sc.nextInt();
+//            System.out.print("Total Over Time Hours: ");
+//            ovTime = sc.nextInt();
+//        
+//        }
+//        
+//        String sql = "INSERT INTO DailyTimeRecords (employee_id, entry_date, month, absent, time_in, time_out, hours_worked, overtime_hrs) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+//
+//        cfg.addRecord(sql, id, entrydate, month, absnt, timein, timeout, h_worked, ovTime);
+//      
+//    }
     
     public void viewRecord(){
         config cfg = new config();
@@ -95,7 +193,7 @@ public class Record {
         try {
             
             System.out.print("Enter the Employee's ID you want to Sort: ");
-            int id = sc.nextInt();  // Employee ID input
+            int id = sc.nextInt();  
             
             
             sc.nextLine();  
@@ -129,10 +227,10 @@ public class Record {
         }
     }
 
-    // Utility method to capitalize the first letter of the month and make the rest lowercase
+    
     private String capitalizeFirstLetter(String input) {
         if (input == null || input.isEmpty()) {
-            return input;  // Handle empty or null input
+            return input;  
         }
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
@@ -143,30 +241,15 @@ public class Record {
         
        config cfg = new config();
      
-   
-       
-       
-        System.out.print("Do you want to Filter Records for (Employee ID) (y/n): ");
-        String opt = sc.nextLine();
         int rid, h_worked, ovTime;
         String timein, timeout, absent;
         String sqlUpdate = "UPDATE DailyTimeRecords SET absent = ?, time_in = ?, time_out = ?, hours_worked = ?, overtime_hrs = ? WHERE record_id = ?";
-        
        
-                
-         switch(opt){
-             
-                 case "y":
-                 case "Y":
-           
-                     
-                 viewRecords();
-                     
                  System.out.print("Enter What Record ID you want to Update: ");
                  rid = sc.nextInt();
                      
-       
-       
+                 viewRecords();
+                     
                 System.out.print("Is the Employee Absent? (Yes || No):  ");
                 String absnt = sc.next();
                 
@@ -195,10 +278,9 @@ public class Record {
                 
 
                cfg.updateEmployee(sqlUpdate, absnt, timein, timeout, h_worked, ovTime, rid);
-                     break;
+                
                      
-                 case "N":
-                 case "n":
+                
                   
                      System.out.print("Enter What Record ID you want to Update: ");
                      rid = sc.nextInt();
@@ -232,11 +314,11 @@ public class Record {
         
         
        cfg.updateEmployee(sqlUpdate, absnt, timein, timeout, h_worked, ovTime, rid);
-                     break;
+                    
          }
          
-         
-    }
+
+    
      
      
      public void deleteRecord() {
@@ -285,7 +367,7 @@ public class Record {
             System.out.println();
             System.out.println("1. Add Daily Time Record");
             System.out.println("2. View Daily Time Records");
-            System.out.println("3. Update Daily Time Record");
+            System.out.println("3. Edit Daily Time Record");
             System.out.println("4. Delete Daily Time Record");
             System.out.println("5. Exit");
             System.out.println();
@@ -307,15 +389,18 @@ public class Record {
                 break;
             
             case 2:
+                
                    viewEmployeesv2();
                    viewRecords();
              
                 break;
                
             case 3:
-                viewRecord();
+                
+                viewEmployeesv2();
+                viewRecords();
                 updateRecord();
-                return;
+                break;
                 
             case 4:
                 viewEmployeesv2();

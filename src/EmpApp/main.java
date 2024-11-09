@@ -31,7 +31,7 @@ public class main {
         System.out.println();
         System.out.println("   1. Manage Employee Records");
         System.out.println("   2. Manage Daily Time Records");
-        System.out.println("   3. Generate Reports");
+        System.out.println("   3. Reports");
         System.out.println("   4. Exit Application");
         System.out.println();
         System.out.println("***********************************************");

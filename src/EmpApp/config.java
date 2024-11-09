@@ -1,6 +1,7 @@
 
 package EmpApp;
 
+import Reports.Reports;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -213,7 +214,7 @@ public class config {
     return false;
 }   
     
-     public void viewRecordsEmp(String sqlQuery, String[] columnHeaders, String[] columnNames) {
+   public void viewRecordsEmp(String sqlQuery, String[] columnHeaders, String[] columnNames) {
       
         if (columnHeaders.length != columnNames.length) {
             System.out.println("Error: Mismatch between column headers and column names.");
@@ -226,11 +227,11 @@ public class config {
 
             
             StringBuilder headerLine = new StringBuilder();
-            headerLine.append("-------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
+            headerLine.append("----------------------------------------------------------------------------------\n| ");
             for (String header : columnHeaders) {
-                headerLine.append(String.format("%-30s | ", header)); 
+                headerLine.append(String.format("%-24s | ", header)); 
             }
-            headerLine.append("\n-------------------------------------------------------------------------------------------------------------------------------------------------");
+            headerLine.append("\n----------------------------------------------------------------------------------");
 
             System.out.println(headerLine.toString());
 
@@ -239,19 +240,25 @@ public class config {
                 StringBuilder row = new StringBuilder("| ");
                 for (String colName : columnNames) {
                     String value = rs.getString(colName);
-                    row.append(String.format("%-30s | ", value != null ? value : ""));
+                    row.append(String.format("%-24s | ", value != null ? value : ""));
                 }
                 System.out.println(row.toString());
             }
-            System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------------------");
 
         } catch (SQLException e) {
             System.out.println("Error retrieving records: " + e.getMessage());
         }
      }    
      
+
+
         
     }
+
+     
+        
+    
 
 
     
