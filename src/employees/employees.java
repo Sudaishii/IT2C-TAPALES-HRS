@@ -5,6 +5,13 @@ import static EmpApp.config.connectDB;
 import EmpApp.config;
 import java.util.Scanner;
 import EmpApp.config.*;
+import static EmpApp.config.connectDB;
+import EmpApp.validation;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 
 
 
@@ -13,33 +20,83 @@ import EmpApp.config.*;
 public class employees {
     
     
+     public double getSingleValue(String sql, Object... params) {
+        double result = 0.0;
+        try (Connection conn = connectDB();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            setPreparedStatementValues(pstmt, params);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                result = rs.getDouble(1);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving single value: " + e.getMessage());
+        }
+        return result;
+    }
     
+   private void setPreparedStatementValues(PreparedStatement pstmt, Object... values) throws SQLException {
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] instanceof Integer) {
+                pstmt.setInt(i + 1, (Integer) values[i]);
+            } else if (values[i] instanceof Double) {
+                pstmt.setDouble(i + 1, (Double) values[i]);
+            } else if (values[i] instanceof Float) {
+                pstmt.setFloat(i + 1, (Float) values[i]);
+            } else if (values[i] instanceof Long) {
+                pstmt.setLong(i + 1, (Long) values[i]);
+            } else if (values[i] instanceof Boolean) {
+                pstmt.setBoolean(i + 1, (Boolean) values[i]);
+            } else if (values[i] instanceof java.util.Date) {
+                pstmt.setDate(i + 1, new java.sql.Date(((java.util.Date) values[i]).getTime()));
+            } else if (values[i] instanceof java.sql.Date) {
+                pstmt.setDate(i + 1, (java.sql.Date) values[i]);
+            } else if (values[i] instanceof java.sql.Timestamp) {
+                pstmt.setTimestamp(i + 1, (java.sql.Timestamp) values[i]);
+            } else {
+                pstmt.setString(i + 1, values[i].toString());
+            }
+        }
+    }
     
     
     public void addEmployees(){
          
         Scanner sc = new Scanner(System.in);
+        validation val = new validation();
         config conf = new config();
         
+        
         System.out.print("Enter Employee's First Name: ");
-        String fname = sc.nextLine();
+        String fname = val.validateName();
+        
         System.out.print("Enter Employee's Last Name: ");
-        String lname = sc.nextLine();
+        String lname = val.validateName();
+        
         System.out.print("Enter Employee's Address: ");
-        String addrss = sc.nextLine();
+        String addrss = val.validateAddress();
+        
         System.out.print("Enter Employee's Email Address: ");
-        String email = sc.nextLine();
+        String email = val.validateEmail();
+           
         System.out.print("Enter Employee's Contact Number: ");
-        String num = sc.nextLine();
+        String num = val.validateconNum();
+        
         System.out.print("Enter Employee's Hire Date (yyyy-MM-dd): ");
-        String hdate = sc.nextLine();
-        System.out.print("Enter Employee's Department: ");
-        String dept = sc.nextLine();
-        System.out.print("Enter Employee's Position: ");
-        String pos = sc.nextLine();
+        String hdate = val.validateHireDate();
+        
+        String deptAndPos = val.DeptandPosi();
+        String[] deptPosArray = deptAndPos.split(":");
+        String dept = deptPosArray[0].trim();
+        String pos = deptPosArray[1].trim();
+
+
+        
         System.out.print("Enter Employee's Rate (per hour): ");
-        int rate = sc.nextInt();
-        sc.nextLine();
+        int rate = val.Rate();
+
        
 
         String sql = "INSERT INTO tbl_employees (emp_fname, emp_lname, emp_add, emp_email, emp_contactnum, emp_hdate, emp_dept, emp_position, emp_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -65,9 +122,10 @@ public class employees {
         
         config cfg = new config();
         Scanner oha = new Scanner(System.in);
+        validation val = new validation();
+        boolean selected = false;
 
-        boolean updating = true;
-        while(updating){
+    do{
             
         System.out.println("***********************************************");
         System.out.println("*            Update Employee Details          *");
@@ -75,28 +133,35 @@ public class employees {
         System.out.println("1. Update Address");
         System.out.println("2. Update Email Address");
         System.out.println("3. Update Contact Number");
-        System.out.println("4. Update Department");
-        System.out.println("5. Update Job Position");
-        System.out.println("6. Update All Details");
-        System.out.println("7. Exit Update Menu");
+        System.out.println("4. Update Department and Position");
+        System.out.println("5. Update All Details");
+        System.out.println("6. Exit Update Menu");
         System.out.println("***********************************************");
         
-        System.out.print("Please select an option (1-7): ");
-        int choice = oha.nextInt();
+        System.out.print("Please select an option (1-6): ");
+        int choice = val.validateChoice();
         
         int id;
         String email, contact, dept, post, add;
+         String deptAndPos;
+         String[] deptPosArray;
+        
+        
         
         switch(choice){
             
             case 1: 
                 
                 System.out.print("Enter Employee ID: ");
-                id = oha.nextInt();
-                oha.nextLine();
+                id = val.validateInt();
+                
+                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
+                System.out.print("\tERROR: ID doesn't exist, try again: ");
+                id = val.validateInt();
+            }
                 
                 System.out.print("Enter New Address: ");
-                add = oha.nextLine();
+                add = val.validateAddress();
                 
                 String sqlUpdateAdd = "UPDATE tbl_employees SET emp_add = ? WHERE emp_id = ?";
                 
@@ -107,11 +172,15 @@ public class employees {
             case 2:
                  
                 System.out.print("Enter Employee ID: ");
-                id = oha.nextInt();
-                oha.nextLine();
+                id = val.validateInt();
+                
+                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
+                System.out.print("\tERROR: ID doesn't exist, try again: ");
+                id = val.validateInt();
+            }
                 
                 System.out.print("Enter New Email Address: ");
-                email = oha.nextLine();
+                email = val.validateEmail();
                 
                 String sqlUpdateEmail = "UPDATE tbl_employees SET emp_email = ? WHERE emp_id = ?";
                 
@@ -122,11 +191,15 @@ public class employees {
             case 3: 
                 
                 System.out.print("Enter Employee ID: ");
-                id = oha.nextInt();
-                oha.nextLine();
+                id = val.validateInt();
+                
+                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
+                System.out.print("\tERROR: ID doesn't exist, try again: ");
+                id = val.validateInt();
+            }
                 
                 System.out.print("Enter New Contact Number: ");
-                 contact = oha.nextLine();
+                contact = val.validateconNum();
                 
                 String sqlUpdateNum = "UPDATE tbl_employees SET emp_contactnum = ? WHERE emp_id = ?";
                 
@@ -136,53 +209,49 @@ public class employees {
                 
             case 4:
                 
-                System.out.print("Enter Employee ID: ");
-                id = oha.nextInt();
-                oha.nextLine();
+               System.out.print("Enter Employee ID: ");
+                id = val.validateInt();
                 
-                System.out.print("Enter New Department: ");
-                 dept = oha.next();
+                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
+                System.out.print("\tERROR: ID doesn't exist, try again: ");
+                id = val.validateInt();
+            }
+                deptAndPos = val.UpdateDeptandPosi(); 
+                deptPosArray = deptAndPos.split(":");
+
+                dept = deptPosArray[0].trim();
+                post = deptPosArray[1].trim();
                 
-                String sqlUpdateDept = "UPDATE tbl_employees SET emp_dept = ? WHERE emp_id = ?";
-                
-                cfg.updateEmployee(sqlUpdateDept, dept, id);
+                String sqlUpdateDept = "UPDATE tbl_employees SET emp_dept = ?, emp_position = ? WHERE emp_id = ?";
+                cfg.updateEmployee(sqlUpdateDept, dept, post, id);
                 
                 break;
+             
                 
             case 5:
                 
                 System.out.print("Enter Employee ID: ");
-                id = oha.nextInt();
-                oha.nextLine();
+                id = val.validateInt();
                 
-                System.out.print("Enter New Position: ");
-                 post = oha.next();
-                
-                String sqlUpdatePos = "UPDATE tbl_employees SET emp_position = ? WHERE emp_id = ?";
-                
-                cfg.updateEmployee(sqlUpdatePos, post, id);
-                break;
-                
-            case 6:
-                
-                System.out.print("Enter Employee ID: ");
-                id = oha.nextInt();
-                oha.nextLine();
+                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
+                System.out.print("\tERROR: ID doesn't exist, try again: ");
+                id = val.validateInt();
+            }
                 
                 System.out.print("Enter New Address: ");
-                add = oha.nextLine();
+                add = val.validateAddress();
                 
                 System.out.print("Enter New Email Address: ");
-                email = oha.nextLine();
+                email = val.validateEmail();
                 
                 System.out.print("Enter New Contact Number: ");
-                contact = oha.nextLine();
+                contact = val.validateconNum();
                 
-                System.out.print("Enter New Department: ");
-                 dept = oha.next();
-                
-                System.out.print("Enter New Position: ");
-                post = oha.next();
+                deptAndPos = val.UpdateDeptandPosi(); 
+                deptPosArray = deptAndPos.split(":");
+
+                dept = deptPosArray[0].trim();
+                post = deptPosArray[1].trim();
                 
                 String sqlUpdate = "UPDATE tbl_employees SET emp_add = ?, emp_email = ?, emp_contactnum = ?, emp_dept = ?, emp_positon = ? WHERE emp_id = ?";
                 
@@ -190,86 +259,49 @@ public class employees {
                 cfg.updateEmployee(sqlUpdate, add, email, contact, dept, post, id);
                 break;
             
-            case 7:
-                updating = false;
-                System.out.println("Exiting Main Menu . . .");
+            case 6:
+                
+                selected = true;
+                System.out.println("Going Back . . .");
                 break;
                 
             default:
-                 System.out.println("\t\tInvalid option. Please select a valid option (1-7).");
-                break;
-        }
-        
-        
+                
+                 System.out.println("\t\tInvalid option. Please select a valid option (1-6).\n");
+                
+            } 
             
-        }
+        }while(!selected);
         
-        
-        
-        
-//         
-//        
-//        System.out.print("Enter Employee ID: ");
-//        int id = oha.nextInt();
-//        
-//        
-//        System.out.print("Enter New Email Address: ");
-//        String email = oha.next();
-//        
-//        System.out.print("Enter New Contact #: ");
-//        String contact = oha.next();
-//        
-//        System.out.print("Enter New Job Title: ");
-//        String title = oha.next();
-//        
-//
-//        String sqlUpdate = "UPDATE tbl_employees SET emp_add = ?, emp_contantnum = ?, emp_title = ? WHERE emp_id = ?";
-//
-//
-//       
-//      
-//      
-//       
-    }
+           
     
+}   
      public void deleteEmployees() {
         Scanner sc = new Scanner(System.in);
-        config dbConfig = new config();
-
+        validation val = new validation();
+        config cfg = new config();
+        
         System.out.print("Enter the ID you want to delete: ");
-        int id = sc.nextInt();
+        int id = val.validateInt();
+        
+         while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
+                System.out.print("\tERROR: ID doesn't exist, try again: ");
+                id = val.validateInt();
+         }
         
         String sqlDelete = "DELETE FROM tbl_employees WHERE emp_id = ?";
 
-        config cfg = new config();
-        
         cfg.deleteEmployees(sqlDelete, id);
     }
-
-
-    
-    
-       
-//    public static void main(String[] args) {
-//        config dbConfig = new config();
-//
-//       
-//        String sqlDelete = "DELETE FROM students WHERE id = ?";
-//
-//  
-//        int studentIdToDelete = 1;
-//
-//        
-//        cfg.deleteEmployee(sqlDelete, studentIdToDelete);
-//    }
-
     
     public static void Employee(){
         
         Scanner sc = new Scanner(System.in);
         String choice;
         employees use = new employees();
+        validation val = new validation();
         
+        boolean selected = false;
         
       do{  
         
@@ -288,7 +320,7 @@ public class employees {
             System.out.println();
     
           System.out.print("Enter Action: ");
-          int actn = sc.nextInt();
+          int actn = val.validateChoice();
 
         
         switch(actn){
@@ -304,6 +336,7 @@ public class employees {
                 break;
                 
             case 3: 
+                
                  System.out.println("\n\nListing Employees . . .");
                  use.viewEmployees();
                  use.updateEmployees();
@@ -312,29 +345,26 @@ public class employees {
                 break;
                 
             case 4: 
+                
                 use.viewEmployees();
                 use.deleteEmployees();
                 use.viewEmployees();
                 break;
                 
-                
             case 5:
-                return;
+                
+                selected = true;
             
             default: 
                 
                 System.out.println("Invalid Selection!");
-                System.out.println("Going Back to the Main Menu . . .");
-                return;
-                  
-      }
-            
-          System.out.print("Do you want to continue (y/n): ");
-          choice = sc.next();
-        
-      }while(choice.equals("Y") || choice.equals("y"));
+               
+        }         
       
-      return;
+
+    } while (!selected);
+
+    System.out.println("Exiting Employee Management Menu...");
 }
 
     

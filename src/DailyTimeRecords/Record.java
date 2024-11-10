@@ -3,7 +3,14 @@ package DailyTimeRecords;
 
 
 import EmpApp.config;
+import static EmpApp.config.connectDB;
+import EmpApp.validation;
 import employees.employees;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Scanner;
 import java.time.LocalDate;
@@ -19,150 +26,115 @@ public class Record {
     
     
   public void AddDTR() {
-    Scanner sc = new Scanner(System.in);
+    Scanner sc = new Scanner(System.in);  
     config cfg = new config();
+    validation val = new validation();
 
     System.out.print("Enter Employee's ID: ");
-    String id = sc.next();
+    String idInput = sc.nextLine();
+    int id = val.validateint(idInput);  
+    
+    while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+        System.out.print("\tERROR: ID doesn't exist, try again: ");
+        idInput = sc.nextLine();  
+        id = val.validateint(idInput);  
+    }
+   
+   
     System.out.print("Enter Entry Date (yyyy-MM-dd): ");
-    String entrydate = sc.next();
+    String entrydate = val.validateEntryDate();
+
+
     LocalDate date = LocalDate.parse(entrydate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     String month = date.getMonth().toString();
-    
+
+ 
     System.out.print("Is the Employee Absent? (Yes || No):  ");
-    String absnt = sc.next();
+    String absnt = sc.next();  
     
-  
+    while (!(absnt.equalsIgnoreCase("Yes") || absnt.equalsIgnoreCase("No"))) {
+        System.out.print("Invalid input. Please enter 'Yes' or 'No': ");
+        absnt = sc.next();
+    }
+
     String timein = "";
     String timeout = "";
     int h_worked = 0;
     int ovTime = 0;
 
     if (absnt.equalsIgnoreCase("No") || absnt.equalsIgnoreCase("n")) {
-        
-        
         LocalTime minTimeIn = LocalTime.of(8, 0);
-        LocalTime maxTimeIn = LocalTime.of(22, 0); 
+        LocalTime maxTimeIn = LocalTime.of(22, 0);
 
-       
         LocalTime timeIn = null;
         while (timeIn == null) {
             try {
                 System.out.print("Time In (HH:mm): ");
-                timein = sc.next();
+                timein = sc.next(); 
                 timeIn = LocalTime.parse(timein, DateTimeFormatter.ofPattern("HH:mm"));
 
-              
                 if (timeIn.isBefore(minTimeIn) || timeIn.isAfter(maxTimeIn)) {
-                    System.out.println("Invalid Time In. Please enter a time between 08:00 and 22:00.");
+                    System.out.print("\tInvalid Time In. Please enter a time between 08:00 and 22:00.");
                     timeIn = null;
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid format. Please enter time in HH:mm format.");
+                System.out.print("\tInvalid format. Please enter time in HH:mm format.");
             }
         }
 
-       
         LocalTime timeOut = null;
         while (timeOut == null) {
             try {
                 System.out.print("Time Out (HH:mm): ");
-                timeout = sc.next();
+                timeout = sc.next(); 
                 timeOut = LocalTime.parse(timeout, DateTimeFormatter.ofPattern("HH:mm"));
-                
-            
+
+          
                 if (timeOut.isBefore(minTimeIn) || timeOut.isAfter(maxTimeIn)) {
-                    System.out.println("Invalid Time Out. Please enter a time between 08:00 and 22:00.");
-                    timeOut = null; 
+                    System.out.print("\tInvalid Time Out. Please enter a time between 08:00 and 22:00.");
+                    timeOut = null;  
                 }
-               
+
+   
                 if (timeout.equals("24:00")) {
                     timeOut = LocalTime.of(0, 0);
                 }
 
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid format. Please enter time in (HH:mm | 24 HOUR) format.");
+                System.out.print("\tInvalid format. Please enter time in (HH:mm | 24 HOUR) format.");
             }
         }
 
-     
         Duration workedDuration = Duration.between(timeIn, timeOut);
         h_worked = (int) workedDuration.toHours();
         int remainingMinutes = (int) workedDuration.toMinutes() % 60;
 
 
         if (h_worked < 0) {
-            System.out.println("Time Out cannot be earlier than Time In. Please check the times entered.");
+            System.out.print("\tTime Out cannot be earlier than Time In. Please check the times entered.");
             return;
         }
 
-        System.out.println("Total Hours Worked: " + h_worked + " hours and " + remainingMinutes + " minutes");
+        System.out.print("Total Hours Worked: " + h_worked + " hours and " + remainingMinutes + " minutes");
 
-    
         int standardHours = 8;
-
-  
         if (h_worked > standardHours) {
-            ovTime = h_worked - standardHours; 
+            ovTime = h_worked - standardHours;
         }
 
-    
         System.out.println("Total Over Time Hours: " + ovTime);
     }
 
-   
     String sql = "INSERT INTO DailyTimeRecords (employee_id, entry_date, month, absent, time_in, time_out, hours_worked, overtime_hrs) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     cfg.addRecord(sql, id, entrydate, month, absnt, timein, timeout, h_worked, ovTime);
 }
 
 
-
-    
-    
-//    public void AddDTR(){
-//        
-//        config cfg = new config();
-//        
-//        System.out.print("Enter Employee's ID: ");
-//        String id = sc.next();
-//        System.out.print("Enter Entry Date (yyyy-MM-dd): ");
-//        String entrydate = sc.next();
-//        LocalDate date = LocalDate.parse(entrydate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-//        String month = date.getMonth().toString(); 
-//        System.out.print("Is the Employee Absent? (Yes || No):  ");
-//        String absnt = sc.next();
-//        String timein;
-//        String timeout;
-//        int h_worked;
-//        int ovTime;
-//        
-//        if (absnt.equals("Yes") || absnt.equals("yes") ||  absnt.equals('y') || absnt.equals('Y') ){
-//            timein = "";
-//            timeout = "";
-//            h_worked = 0;
-//            ovTime = 0;
-//        }
-//        
-//        else{   
-//            
-//            System.out.print("Time In: ");
-//            timein = sc.next();
-//            System.out.print("Time Out: ");
-//            timeout = sc.next();
-//            System.out.print("Total Hours Worked: ");
-//            h_worked = sc.nextInt();
-//            System.out.print("Total Over Time Hours: ");
-//            ovTime = sc.nextInt();
-//        
-//        }
-//        
-//        String sql = "INSERT INTO DailyTimeRecords (employee_id, entry_date, month, absent, time_in, time_out, hours_worked, overtime_hrs) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-//
-//        cfg.addRecord(sql, id, entrydate, month, absnt, timein, timeout, h_worked, ovTime);
-//      
-//    }
     
     public void viewRecord(){
+        
+        
+        
         config cfg = new config();
         
         String emp_dtls = "select * from DailyTimeRecords";
@@ -181,182 +153,452 @@ public class Record {
         cfg.viewRecordsEmp(emp_dtls, emp_hdrs, emp_clmn);
         
     }
-    
-    public void viewRecords(){
-        
-        config cfg = new config();
-        
+    public double getSingleValuev2(String sql, Object... params) {
+    double result = 0.0;
+    try (Connection conn = connectDB();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        Scanner sc = new Scanner(System.in);
+        // Set all the parameters in the prepared statement dynamically
+        setPreparedStatementValues(pstmt, params);
 
-    
-        try {
-            
-            System.out.print("Enter the Employee's ID you want to Sort: ");
-            int id = sc.nextInt();  
-            
-            
-            sc.nextLine();  
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            result = rs.getDouble(1);
+        }
 
-           
-            System.out.print("Enter the Month you want to Sort (Must be Uppercase): ");
-            String month = sc.nextLine().trim();  
+    } catch (SQLException e) {
+        System.out.println("Error retrieving single value: " + e.getMessage());
+    }
+    return result;
+}
 
-            
-            String record_dtls = "SELECT * FROM DailyTimeRecords WHERE employee_id = ? AND month = ?";
-
-           
-            String[] dtr_hdrs = {
-                "Record ID", "Employee ID", "Entry Date", "Time In", 
-                "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"
-            };
-
-          
-            String[] dtr_clmn = {
-                "record_id", "employee_id", "entry_date", "time_in", 
-                "time_out", "month", "hours_worked", "overtime_hrs", "absent"
-            };
-
-           
-            cfg.viewRecordsV2(record_dtls, dtr_hdrs, dtr_clmn, id, month);
-
-        } catch (Exception e) {
-            
-            e.printStackTrace();
-            System.out.println("An error occurred while fetching records. Please try again.");
+   private void setPreparedStatementValues(PreparedStatement pstmt, Object... values) throws SQLException {
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] instanceof Integer) {
+                pstmt.setInt(i + 1, (Integer) values[i]);
+            } else if (values[i] instanceof Double) {
+                pstmt.setDouble(i + 1, (Double) values[i]);
+            } else if (values[i] instanceof Float) {
+                pstmt.setFloat(i + 1, (Float) values[i]);
+            } else if (values[i] instanceof Long) {
+                pstmt.setLong(i + 1, (Long) values[i]);
+            } else if (values[i] instanceof Boolean) {
+                pstmt.setBoolean(i + 1, (Boolean) values[i]);
+            } else if (values[i] instanceof java.util.Date) {
+                pstmt.setDate(i + 1, new java.sql.Date(((java.util.Date) values[i]).getTime()));
+            } else if (values[i] instanceof java.sql.Date) {
+                pstmt.setDate(i + 1, (java.sql.Date) values[i]);
+            } else if (values[i] instanceof java.sql.Timestamp) {
+                pstmt.setTimestamp(i + 1, (java.sql.Timestamp) values[i]);
+            } else {
+                pstmt.setString(i + 1, values[i].toString());
+            } 
         }
     }
-
-    
-    private String capitalizeFirstLetter(String input) {
-        if (input == null || input.isEmpty()) {
-            return input;  
-        }
-        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
-    }
-
-    
-    
-     public void updateRecord() {
-        
-       config cfg = new config();
+   
+ public int viewRecordsForUpdate() {
      
-        int rid, h_worked, ovTime;
-        String timein, timeout, absent;
-        String sqlUpdate = "UPDATE DailyTimeRecords SET absent = ?, time_in = ?, time_out = ?, hours_worked = ?, overtime_hrs = ? WHERE record_id = ?";
-       
-                 System.out.print("Enter What Record ID you want to Update: ");
-                 rid = sc.nextInt();
-                     
-                 viewRecords();
-                     
-                System.out.print("Is the Employee Absent? (Yes || No):  ");
-                String absnt = sc.next();
-                
+    config cfg = new config();
+    Scanner sc = new Scanner(System.in);
+    validation val = new validation();
 
-                if (absnt.equals("Yes") || absnt.equals("yes") ){
-                    timein = "";
-                    timeout = "";
-                    h_worked = 0;
-                    ovTime = 0;
-                    absent = "Yes";
-                }
+    try {
 
-                else{   
-                    absent = "No";
-                    System.out.print("Time In: ");
-                    timein = sc.next();
-                    System.out.print("Time Out: ");
-                    timeout = sc.next();
-                    System.out.print("Total Hours Worked: ");
-                    h_worked = sc.nextInt();
-                    System.out.print("Total Over Time Hours: ");
-                    ovTime = sc.nextInt();
+        System.out.print("Enter the Employee's ID you want to Sort: ");
+        String idInput = sc.nextLine();
+        int id = val.validateint(idInput);
 
-                }
-
-                
-
-               cfg.updateEmployee(sqlUpdate, absnt, timein, timeout, h_worked, ovTime, rid);
-                
-                     
-                
-                  
-                     System.out.print("Enter What Record ID you want to Update: ");
-                     rid = sc.nextInt();
-        
-       
-        System.out.print("Is the Employee Absent? (Yes || No):  ");
-        absnt = sc.next();
-        
-        
-        if (absnt.equals("Yes") || absnt.equals("yes") ){
-            timein = "";
-            timeout = "";
-            h_worked = 0;
-            ovTime = 0;
-            absent = "Yes";
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+            System.out.print("\tERROR: ID doesn't exist, try again: ");
+            idInput = sc.nextLine();
+            id = val.validateint(idInput);
         }
-        
-        else{   
-            absent = "No";
-            System.out.print("Time In: ");
-            timein = sc.next();
-            System.out.print("Time Out: ");
-            timeout = sc.next();
-            System.out.print("Total Hours Worked: ");
-            h_worked = sc.nextInt();
-            System.out.print("Total Over Time Hours: ");
-            ovTime = sc.nextInt();
-        
-        }
+
+                 String month = validateMonthInput(sc);
+   
+        String recordQuery = "SELECT * FROM DailyTimeRecords WHERE employee_id = ? AND month = ?";
+        String[] dtrHeaders = {
+            "Record ID", "Employee ID", "Entry Date", "Time In",
+            "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"
+        };
+        String[] dtrColumns = {
+            "record_id", "employee_id", "entry_date", "time_in",
+            "time_out", "month", "hours_worked", "overtime_hrs", "absent"
+        };
+
+        boolean[] foundFlag = {false};
+        cfg.viewRecordsV2(recordQuery, dtrHeaders, dtrColumns, id, month, foundFlag);
+
        
+        if (!foundFlag[0]) {
+            return -1; 
+        }
+
         
-        
-       cfg.updateEmployee(sqlUpdate, absnt, timein, timeout, h_worked, ovTime, rid);
-                    
+        System.out.print("Enter the Record ID you want to Edit: ");
+        String idInputForRecord = sc.nextLine();
+        int recordId = val.validateint(idInputForRecord);
+
+      
+        while (getSingleValue("SELECT record_id FROM DailyTimeRecords WHERE record_id = ?", recordId) == 0) {
+            System.out.print("\tERROR: Record ID doesn't exist, try again: ");
+            idInputForRecord = sc.nextLine();
+            recordId = val.validateint(idInputForRecord);
+        }
+
+        return recordId;
+
+    } catch (Exception e) {
+        System.out.println("An error occurred. Please try again.");
+        return -1;
+    }
+}
+
+    
+
+   
+    public boolean viewRecords() {
+     config cfg = new config();
+     Scanner sc = new Scanner(System.in);
+     validation val = new validation();
+     
+     
+
+     try {
+
+         System.out.print("Enter the Employee's ID you want to Sort: ");
+         String idInput = sc.nextLine();
+         int id = val.validateint(idInput);
+
+         while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+             System.out.print("\tERROR: ID doesn't exist, try again: ");
+             idInput = sc.nextLine();
+             id = val.validateint(idInput);
+             
          }
          
+         String month = validateMonthInput(sc);
+
+         String recordQuery = "SELECT * FROM DailyTimeRecords WHERE employee_id = ? AND month = ?";
+         String[] dtrHeaders = {
+             "Record ID", "Employee ID", "Entry Date", "Time In",
+             "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"
+         };
+         String[] dtrColumns = {
+             "record_id", "employee_id", "entry_date", "time_in",
+             "time_out", "month", "hours_worked", "overtime_hrs", "absent"
+         };
+
+
+         boolean[] foundFlag = {false};
+         cfg.viewRecordsV2(recordQuery, dtrHeaders, dtrColumns, id, month, foundFlag);
+
+
+         if (!foundFlag[0]) {
+             System.out.println("No records found. Returning to the main menu...");
+             return false;
+         }
+
+         return true; 
+     } catch (Exception e) {
+         e.printStackTrace();
+         System.out.println("An error occurred while fetching records. Please try again.");
+         return false;
+     }
+ }
+
+
 
     
-     
-     
-     public void deleteRecord() {
-         
-        Scanner sc = new Scanner(System.in);
-        config dbConfig = new config();
-        
-        System.out.print("Do you want to Filter Records for (Employee ID) (y/n): ");
-        String chc = sc.nextLine();
-        
-        if (chc.equals("y") || chc.equals("Y")){
-                   
-                   viewRecords();
-               
-               }
-               else if (chc.equals("n") || chc.equals("N")){
-                   
-                   viewRecord();
-                   
-               }
-        
-        System.out.print("Enter the Record ID you want to delete: ");
-        int id = sc.nextInt();
-        
-        String sqlDelete = "DELETE FROM DailyTimeRecords WHERE record_id = ?";
+   private static String validateMonthInput(Scanner sc) {
+        String month;
+        String[] validMonths = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", 
+                                 "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
 
-        config cfg = new config();
-        
-        cfg.deleteEmployees(sqlDelete, id);
+        while (true) {
+            System.out.print("Enter the Month you want to Sort (Must be Uppercase): ");
+            month = sc.nextLine().trim();  
+
+     
+            if (month.matches("[A-Z]+") && isValidMonth(month, validMonths)) {
+                return month; 
+            } else {
+                System.out.println("Invalid input. Please enter a valid month (uppercase letters only).");
+            }
+        }
     }
+
+    private static boolean isValidMonth(String month, String[] validMonths) {
+        for (String validMonth : validMonths) {
+            if (validMonth.equals(month)) {
+                return true; 
+            }
+        }
+        return false;  
+    }
+
+
+ public boolean updateRecord() {
+        config cfg = new config();
+        Scanner sc = new Scanner(System.in);
+        validation val = new validation();
+
+
+        int recordId = viewRecordsForUpdate();
+        if (recordId == -1) {
+            System.out.println("No records found. Returning to the main menu...");
+            return false;
+        }
+
+        try {
+            String timein = "", timeout = "", absent = "";
+            int h_worked = 0, ovTime = 0;
+
+            System.out.print("Is the Employee Absent? (Yes || No): ");
+            String absnt = sc.next();
+            while (!(absnt.equalsIgnoreCase("Yes") || absnt.equalsIgnoreCase("No"))) {
+                System.out.print("Invalid input. Please enter 'Yes' or 'No': ");
+                absnt = sc.next();
+            }
+
+
+            if (absnt.equalsIgnoreCase("Yes")) {
+                timein = "";
+                timeout = "";
+                h_worked = 0;
+                ovTime = 0;
+                absent = "Yes";
+            } else {
+                absent = "No";
+
+                LocalTime minTimeIn = LocalTime.of(8, 0);
+                LocalTime maxTimeIn = LocalTime.of(22, 0);
+                LocalTime timeIn = null;
+
+                while (timeIn == null) {
+                    try {
+                        System.out.print("Time In (HH:mm): ");
+                        timein = sc.next();
+                        timeIn = LocalTime.parse(timein, DateTimeFormatter.ofPattern("HH:mm"));
+
+                        if (timeIn.isBefore(minTimeIn) || timeIn.isAfter(maxTimeIn)) {
+                            System.out.print("\tInvalid Time In. Please enter a time between 08:00 and 22:00.");
+                            timeIn = null;
+                        }
+                    } catch (DateTimeParseException e) {
+                        System.out.print("\tInvalid format. Please enter time in HH:mm format.");
+                    }
+                }
+
+                LocalTime timeOut = null;
+                while (timeOut == null) {
+                    try {
+                        System.out.print("Time Out (HH:mm): ");
+                        timeout = sc.next();
+                        timeOut = LocalTime.parse(timeout, DateTimeFormatter.ofPattern("HH:mm"));
+
+                        if (timeOut.isBefore(minTimeIn) || timeOut.isAfter(maxTimeIn)) {
+                            System.out.print("\tInvalid Time Out. Please enter a time between 08:00 and 22:00.");
+                            timeOut = null;
+                        }
+
+                        if (timeout.equals("24:00")) {
+                            timeOut = LocalTime.of(0, 0);
+                        }
+                    } catch (DateTimeParseException e) {
+                        System.out.print("\tInvalid format. Please enter time in (HH:mm | 24 HOUR) format.");
+                    }
+                }
+
+                Duration workedDuration = Duration.between(timeIn, timeOut);
+                h_worked = (int) workedDuration.toHours();
+                int remainingMinutes = (int) workedDuration.toMinutes() % 60;
+
+                if (h_worked < 0) {
+                    System.out.print("\tTime Out cannot be earlier than Time In. Please check the times entered.");
+                    return false;
+                }
+
+                System.out.println("Total Hours Worked: " + h_worked + " hours and " + remainingMinutes + " minutes");
+
+                int standardHours = 8;
+                if (h_worked > standardHours) {
+                    ovTime = h_worked - standardHours;
+                }
+
+                System.out.println("Total Over Time Hours: " + ovTime);
+            }
+
+            String sqlUpdate = "UPDATE DailyTimeRecords SET absent = ?, time_in = ?, time_out = ?, hours_worked = ?, overtime_hrs = ? WHERE record_id = ?";
+            cfg.updateEmployee(sqlUpdate, absent, timein, timeout, h_worked, ovTime, recordId);
+
+            System.out.println("");
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("An error occurred during the update: " + e.getMessage());
+            return false;
+        }
+    }
+
+ 
+ public double getSingleValue(String sql, Object... params) {
+    double result = 0.0;
+    try (Connection conn = connectDB();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        setPreparedStatementValues(pstmt, params);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            result = rs.getDouble(1);
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error retrieving single value: " + e.getMessage());
+    }
+    return result;
+}
+
+ public int viewRecordsForDelete() {
+    config cfg = new config();
+    Scanner sc = new Scanner(System.in);
+    validation val = new validation();
+
+    try {
+
+        System.out.print("Enter the Employee's ID you want to Sort: ");
+        String idInput = sc.nextLine();
+        int id = val.validateint(idInput);
+
+
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+            System.out.print("\tERROR: ID doesn't exist, try again: ");
+            idInput = sc.nextLine();
+            id = val.validateint(idInput);
+        }
+
+        String month = validateMonthInput(sc);
+
+        String recordQuery = "SELECT * FROM DailyTimeRecords WHERE employee_id = ? AND month = ?";
+        int recordCount = (int) getSingleValue(recordQuery, id, month);
+
+        if (recordCount == 0) {
+            System.out.println("No records found for this employee in " + month);
+            return -1;
+        }
+
+        String[] dtrHeaders = {
+            "Record ID", "Employee ID", "Entry Date", "Time In", 
+            "Time Out", "Month", "Hours Worked", "Overtime Hours", "Absent Status"
+        };
+        String[] dtrColumns = {
+            "record_id", "employee_id", "entry_date", "time_in", 
+            "time_out", "month", "hours_worked", "overtime_hrs", "absent"
+        };
+
+        boolean[] foundFlag = {false};
+        cfg.viewRecordsV2(recordQuery, dtrHeaders, dtrColumns, id, month, foundFlag);
+
+        if (!foundFlag[0]) {
+            return -1;
+        }
+
+        System.out.print("Enter the Record ID you want to Delete: ");
+        String idInputForRecord = sc.nextLine();
+        int recordId = val.validateint(idInputForRecord);
+        
+         while (getSingleValue("SELECT record_id FROM DailyTimeRecords WHERE record_id = ?", recordId) == 0) {
+            System.out.print("\tERROR: Employee ID doesn't exist. Please try again: ");
+            idInput = sc.nextLine();
+            recordId = val.validateint(idInput);
+        }
+        
+        while (getSingleValue("SELECT record_id FROM DailyTimeRecords WHERE record_id = ?", recordId) == 0) {
+            System.out.print("\tERROR: Record ID doesn't exist, try again: ");
+            idInputForRecord = sc.nextLine();
+            recordId = val.validateint(idInputForRecord);
+        }
+
+        return recordId;
+
+    } catch (Exception e) {
+        System.out.println("An error occurred. Please try again.");
+        return -1;
+    }
+}
+
+ 
+ 
+ 
+ public void deleteRecord() {
+    Scanner sc = new Scanner(System.in);
+    config dbConfig = new config();
+    validation val = new validation();
+
+    int recordId = viewRecordsForDelete();
+    if (recordId == -1) {
+        
+        return;
+    }
+
+    try {
+      
+        System.out.print("Enter the Employee ID: ");
+        String idInput = sc.nextLine();
+        int empId = val.validateint(idInput);
+
+
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", empId) == 0) {
+            System.out.print("\tERROR: Employee ID doesn't exist. Please try again: ");
+            idInput = sc.nextLine();
+            empId = val.validateint(idInput);
+        }
+
+
+        String checkRecordQuery = "SELECT COUNT(*) FROM DailyTimeRecords WHERE record_id = ? AND employee_id = ?";
+        int recordExists = (int) getSingleValue(checkRecordQuery, recordId, empId);
+
+
+        if (recordExists == 0) {
+            System.out.println("ERROR: Record ID does not belong to this Employee ID. Deletion aborted.");
+            return;
+        }
+
      
-    
+        String sqlDelete = "DELETE FROM DailyTimeRecords WHERE record_id = ? AND employee_id = ?";
+        dbConfig.deleteEmployees(sqlDelete, recordId, empId); 
+
+        
+    } catch (Exception e) {
+        System.out.println("An error occurred while deleting the record.");
+        e.printStackTrace(); 
+    }
+}
+
+ public int getSingleValueInt(String sql, Object... params) {
+    int result = 0; 
+    try (Connection conn = connectDB();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        setPreparedStatementValues(pstmt, params);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            result = rs.getInt(1); 
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error retrieving single value: " + e.getMessage());
+    }
+    return result;
+}
+
     public void DailyTimeRecord(){
         
         Scanner sc = new Scanner(System.in);
         String choice;
         employees use = new employees();
-        
+        validation val = new validation();
+        boolean selected = false;
         
         do{
         
@@ -376,10 +618,9 @@ public class Record {
             
             
             System.out.print("Enter Action: ");
-            int actn = sc.nextInt();
-            sc.nextLine();
+            int actn = val.validateChoice();
            
-        
+           
         switch(actn){
             
             case 1:
@@ -390,35 +631,35 @@ public class Record {
             
             case 2:
                 
-                   viewEmployeesv2();
-                   viewRecords();
-             
+                viewEmployeesv2();
+                viewRecords();
                 break;
                
             case 3:
-                
-                viewEmployeesv2();
-                viewRecords();
-                updateRecord();
-                break;
+            viewEmployeesv2();
+            if (!updateRecord()) {
+                System.out.print("");
+            }
+            break;
                 
             case 4:
+                
                 viewEmployeesv2();
                 deleteRecord();
                 break;
                 
             case 5:
-                System.out.println("Going back to main menu . . .");
-                return;
+                selected = true;
+                System.out.println("Going back . . .");
+                break;
+                
             default:
-                System.out.print("Error Selection!");
-            
+                
+                System.out.println("Invalid Selection!");
+                    
         }
-            
-            System.out.print("Do you want to continue (y/n): ");
-            choice = sc.next();
-        
-        }while(choice.equals("Y") || choice.equals("y"));
+
+        }while(!selected);
         
         return;
      

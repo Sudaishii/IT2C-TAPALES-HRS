@@ -76,7 +76,7 @@ public class config {
             StringBuilder headerLine = new StringBuilder();
             headerLine.append("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
             for (String header : columnHeaders) {
-                headerLine.append(String.format("%-30s | ", header)); 
+                headerLine.append(String.format("%-31s | ", header)); 
             }
             headerLine.append("\n-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -87,7 +87,7 @@ public class config {
                 StringBuilder row = new StringBuilder("| ");
                 for (String colName : columnNames) {
                     String value = rs.getString(colName);
-                    row.append(String.format("%-30s | ", value != null ? value : ""));
+                    row.append(String.format("%-31s | ", value != null ? value : ""));
                 }
                 System.out.println(row.toString());
             }
@@ -98,29 +98,29 @@ public class config {
         }
      }    
         public void updateEmployee(String sql, Object... values) {
-        try (Connection conn = this.connectDB(); // Use the connectDB method
+        try (Connection conn = this.connectDB(); 
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Loop through the values and set them in the prepared statement dynamically
+            
             for (int i = 0; i < values.length; i++) {
                 if (values[i] instanceof Integer) {
-                    pstmt.setInt(i + 1, (Integer) values[i]); // If the value is Integer
+                    pstmt.setInt(i + 1, (Integer) values[i]); 
                 } else if (values[i] instanceof Double) {
-                    pstmt.setDouble(i + 1, (Double) values[i]); // If the value is Double
+                    pstmt.setDouble(i + 1, (Double) values[i]);
                 } else if (values[i] instanceof Float) {
-                    pstmt.setFloat(i + 1, (Float) values[i]); // If the value is Float
+                    pstmt.setFloat(i + 1, (Float) values[i]); 
                 } else if (values[i] instanceof Long) {
-                    pstmt.setLong(i + 1, (Long) values[i]); // If the value is Long
+                    pstmt.setLong(i + 1, (Long) values[i]); 
                 } else if (values[i] instanceof Boolean) {
-                    pstmt.setBoolean(i + 1, (Boolean) values[i]); // If the value is Boolean
+                    pstmt.setBoolean(i + 1, (Boolean) values[i]); 
                 } else if (values[i] instanceof java.util.Date) {
-                    pstmt.setDate(i + 1, new java.sql.Date(((java.util.Date) values[i]).getTime())); // If the value is Date
+                    pstmt.setDate(i + 1, new java.sql.Date(((java.util.Date) values[i]).getTime()));
                 } else if (values[i] instanceof java.sql.Date) {
-                    pstmt.setDate(i + 1, (java.sql.Date) values[i]); // If it's already a SQL Date
+                    pstmt.setDate(i + 1, (java.sql.Date) values[i]); 
                 } else if (values[i] instanceof java.sql.Timestamp) {
-                    pstmt.setTimestamp(i + 1, (java.sql.Timestamp) values[i]); // If the value is Timestamp
+                    pstmt.setTimestamp(i + 1, (java.sql.Timestamp) values[i]); 
                 } else {
-                    pstmt.setString(i + 1, values[i].toString()); // Default to String for other types
+                    pstmt.setString(i + 1, values[i].toString()); 
                 }
             }
 
@@ -135,13 +135,12 @@ public class config {
     try (Connection conn = this.connectDB();
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        // Loop through the values and set them in the prepared statement dynamically
+        
         for (int i = 0; i < values.length; i++) {
             if (values[i] instanceof Integer) {
-                pstmt.setInt(i + 1, (Integer) values[i]); // If the value is Integer
+                pstmt.setInt(i + 1, (Integer) values[i]); 
             } else {
-                pstmt.setString(i + 1, values[i].toString()); // Default to String for other types
-            }
+                pstmt.setString(i + 1, values[i].toString());             }
         }
 
         pstmt.executeUpdate();
@@ -151,54 +150,52 @@ public class config {
     }
     
 }
-        
-         public void viewRecordsV2(String sqlQuery, String[] columnHeaders, String[] columnNames, int employeeId, String month) {
-        if (columnHeaders.length != columnNames.length) {
-            System.out.println("Error: Mismatch between column headers and column names.");
-            return;
-        }
-
-        try (Connection conn = this.connectDB();
-             PreparedStatement pstmt = conn.prepareStatement(sqlQuery)) {
-
-            // Set the parameters for employee ID and month
-            pstmt.setInt(1, employeeId);
-            pstmt.setString(2, month);
-
-            // Execute the query
-            ResultSet rs = pstmt.executeQuery();
-
-            // Print headers
-            StringBuilder headerLine = new StringBuilder();
-            headerLine.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
-            for (String header : columnHeaders) {
-                headerLine.append(String.format("%-24s | ", header)); 
-            }
-            headerLine.append("\n---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-            System.out.println(headerLine.toString());
-
-            // Print records
-            boolean found = false;  // Flag to check if any records are found
-            while (rs.next()) {
-                found = true;
-                StringBuilder row = new StringBuilder("| ");
-                for (String colName : columnNames) {
-                    String value = rs.getString(colName);
-                    row.append(String.format("%-24s | ", value != null ? value : ""));
-                }
-                System.out.println(row.toString());
-            }
-            
-            if (!found) {
-                System.out.println("| No records found for this employee in " + month + " |");
-            }
-
-            System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-        } catch (SQLException e) {
-            System.out.println("Error retrieving records: " + e.getMessage());
-        }
+       public void viewRecordsV2(String sqlQuery, String[] columnHeaders, String[] columnNames, int employeeId, String month, boolean[] foundFlag) {
+    if (columnHeaders.length != columnNames.length) {
+        System.out.println("Error: Mismatch between column headers and column names.");
+        return;
     }
+
+    try (Connection conn = this.connectDB();
+         PreparedStatement pstmt = conn.prepareStatement(sqlQuery)) {
+
+        pstmt.setInt(1, employeeId);
+        pstmt.setString(2, month);
+
+        ResultSet rs = pstmt.executeQuery();
+
+        StringBuilder headerLine = new StringBuilder();
+        headerLine.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n| ");
+        for (String header : columnHeaders) {
+            headerLine.append(String.format("%-24s | ", header)); 
+        }
+        headerLine.append("\n---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println(headerLine.toString());
+
+        boolean found = false;
+        while (rs.next()) {
+            found = true;
+            StringBuilder row = new StringBuilder("| ");
+            for (String colName : columnNames) {
+                String value = rs.getString(colName);
+                row.append(String.format("%-24s | ", value != null ? value : ""));
+            }
+            System.out.println(row.toString());
+        }
+
+        if (!found) {
+            System.out.println("| No records found for this employee in " + month + " |");
+        }
+
+        System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+       
+        foundFlag[0] = found;
+
+    } catch (SQLException e) {
+        System.out.println("Error retrieving records: " + e.getMessage());
+    }
+}
 
         
      public boolean recordExists(String sql, int employeeId, LocalDate entryDate) {
@@ -251,7 +248,7 @@ public class config {
         }
      }    
      
-
+     
 
         
     }

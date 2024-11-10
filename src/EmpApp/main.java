@@ -6,17 +6,23 @@ import static EmpApp.config.connectDB;
 import Reports.Reports;
 import employees.employees;
 import java.util.Scanner;
+import EmpApp.validation;
 
 
 public class main {
     
-    /*DELETE FROM tbl_employees;*/
+    
      
 
     public static void main(String[] args) {
         
         Scanner oha = new Scanner(System.in);
         String choice;  
+        employees emp = new employees();
+        Record rcrd = new Record();
+        Reports rpt = new Reports();
+        validation val = new validation();
+        
         
        do{
            
@@ -36,31 +42,48 @@ public class main {
         System.out.println();
         System.out.println("***********************************************");
 
+        
         System.out.print("Enter Action: ");
-        int act = oha.nextInt();
+        int act = val.validateChoice();
            
          
          switch(act){
              
              case 1:
-                    employees emp = new employees();
                     emp.Employee();
                     break;
                     
              case 2:
-                    Record rcrd = new Record();
                     rcrd.DailyTimeRecord();
                     break;
                     
              case 3:
-                 Reports rpt = new Reports();
                  rpt.Report();
                  break;
+                 
+                         
+             case 4:
+                 
+                 System.out.print("Please Confirm to Exit (y/n): ");
+                 String cnfrm = oha.nextLine();
+                 
+                    if (cnfrm.equals("y") || cnfrm.equals("Y") ){
+                        
+                           System.out.println("Exiting the application. Goodbye! Thank You!");
+                           System.exit(0); 
+                           
+                    }
+                    else if (cnfrm.equals("n") || cnfrm.equals("N")){
+                        break;
+                    }
+                            
+
+             default:
                     
+                    System.out.print("\tError! Invalid selection.\n");    
+                    break;
                     
          }
-         
-           
          
        }while(true);
        
