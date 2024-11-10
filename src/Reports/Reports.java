@@ -1,17 +1,16 @@
-    package Reports;
-
-    import DailyTimeRecords.Record;
-    import EmpApp.config;
+package Reports;
+import DailyTimeRecords.Record;
+import EmpApp.config;
 import static EmpApp.config.connectDB;
 import EmpApp.validation;
-    import employees.employees;
-    import java.sql.*;
+import employees.employees;
+import java.sql.*;
 import java.time.DayOfWeek;
-    import java.time.LocalDate;
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.HashSet;
-    import java.util.Scanner;
+import java.util.Scanner;
 import java.util.Set;
 
     public class Reports {
@@ -31,12 +30,19 @@ import java.util.Set;
         
    public void indivPayroll() {
     Scanner sc = new Scanner(System.in);
-
+    validation val = new validation();
    
     System.out.print("Enter Report ID: ");
-    String reportId = sc.nextLine();
+    String idInput = sc.nextLine();
+    int reportId = val.validateint(idInput);
 
-       System.out.println("");
+        while (getSingleValue("SELECT report_id FROM reports WHERE report_id = ?", reportId) == 0) {
+            System.out.print("\tERROR: ID doesn't exist, try again: ");
+            idInput = sc.nextLine();
+            reportId = val.validateint(idInput);
+        }
+
+
     
     try (Connection con = connectDB()) {
         if (con == null) {
@@ -51,7 +57,7 @@ import java.util.Set;
                      + "WHERE r.report_id = ?";
 
         try (PreparedStatement pst = con.prepareStatement(query)) {
-            pst.setString(1, reportId);
+            pst.setInt(1, reportId);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 
@@ -73,7 +79,8 @@ import java.util.Set;
                 double netPay = rs.getDouble("net_pay");
                 String dateGenerated = rs.getString("date_generated");
 
-              
+                
+                System.out.println("\n");
                 System.out.println("***************************************************************************");
                 System.out.println("                            PAYROLL STATEMENT                             ");
                 System.out.println("***************************************************************************");
@@ -490,65 +497,25 @@ public void generateReport(Connection con) throws SQLException {
              
          Scanner sc = new Scanner(System.in);
          config cfg = new config();
+         validation val = new validation();
              
-          System.out.println("\nFilter Reports:");
-          System.out.println("1. By Employee ID");
-          System.out.println("2. By Month");
-          System.out.println("3. By Department");
-          System.out.println("4. All Reports");
-          System.out.print("Choose (1/2/3/4): ");
-          int choice = sc.nextInt();
-          sc.nextLine(); 
-      
-          String query = "SELECT r.*, e.emp_fname, e.emp_lname, e.emp_dept, e.emp_rate "
-                     + "FROM Reports r "
-                     + "JOIN tbl_employees e ON r.emp_id = e.emp_id "
-                     + "WHERE r.report_id = ?";
-        
-        
-         if (choice == 1) {
-             Record rcrd = new Record();
-             rcrd.viewEmployeesv2();
-             System.out.print("Enter Employee ID: ");
-             int empId = sc.nextInt();
-             query += "WHERE r.emp_id = " + empId + " ";
-         } 
-
-         else if (choice == 2) {
-             System.out.print("Enter Month (Must be Uppercase): ");
-             String month = sc.nextLine();
-             query += "WHERE r.month = '" + month + "' ";
-         } 
-
-         else if (choice == 3) {
-             System.out.print("Enter Department: ");
-             String dept = sc.nextLine();
-             query += "WHERE e.emp_dept = '" + dept + "' ";
-
-             System.out.print("Do you want to filter by Month? (y/n): ");
-             String filterByMonth = sc.nextLine().toLowerCase();
-             if (filterByMonth.equals("y")) {
-                 System.out.print("Enter Month (Must be Uppercase): ");
-                 String month = sc.nextLine();
-                 query += "AND r.month = '" + month + "' ";
-             }
-         }
-
-         query += "ORDER BY r.date_generated DESC"; 
+          viewGeneratedReports();
         
         System.out.print("Enter the Report ID you want to delete: ");
-        int id = sc.nextInt();
-        
+         String idInput = sc.nextLine();
+        int id = val.validateint(idInput);
+
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+                    System.out.print("\tERROR: ID doesn't exist, try again: ");
+                    idInput = sc.nextLine();
+                    id = val.validateint(idInput);
+                }
+
         String sqlDelete = "DELETE FROM reports WHERE report_id = ?";
 
         
         cfg.deleteEmployees(sqlDelete, id);
     }
-
-         
-        
-         
-         
          
         public void Report() {
             

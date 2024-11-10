@@ -87,7 +87,7 @@ public class employees {
         System.out.print("Enter Employee's Hire Date (yyyy-MM-dd): ");
         String hdate = val.validateHireDate();
         
-        String deptAndPos = val.DeptandPosi();
+        String deptAndPos = val.AddDeptandPosi();
         String[] deptPosArray = deptAndPos.split(":");
         String dept = deptPosArray[0].trim();
         String pos = deptPosArray[1].trim();

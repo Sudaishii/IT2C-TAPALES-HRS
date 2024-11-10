@@ -218,12 +218,11 @@ private boolean isContactNumberExists(String contactNumber) {
         return getNum;
    }
  
-public String DeptandPosi() {
-    
+public String AddDeptandPosi() {
     Scanner sc = new Scanner(System.in);
+
     
-    
-    System.out.println("Select Employee's Department:");
+    System.out.println("Select Employee's New Department:");
     System.out.println("1. Finance");
     System.out.println("2. Marketing");
     System.out.println("3. Sales");
@@ -233,15 +232,30 @@ public String DeptandPosi() {
     System.out.println("7. Administrative");
     System.out.println("8. Product Management");
     System.out.println("9. Legal");
-    
-    System.out.print(": ");
-    int deptChoice = sc.nextInt();
-    sc.nextLine(); 
-    
-    String dept = "";
-    String position = "";
 
-   
+    int deptChoice = 0;
+    String dept = "";
+    
+ 
+    while (true) {
+        System.out.print(": ");
+        if (sc.hasNextInt()) {
+            deptChoice = sc.nextInt();
+            sc.nextLine(); 
+            
+         
+            if (deptChoice >= 1 && deptChoice <= 9) {
+                break; 
+            } else {
+                System.out.println("Invalid department choice. Please choose a number between 1 and 9.");
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine(); 
+        }
+    }
+
+  
     switch (deptChoice) {
         case 1: dept = "Finance"; break;
         case 2: dept = "Marketing"; break;
@@ -252,61 +266,82 @@ public String DeptandPosi() {
         case 7: dept = "Administrative"; break;
         case 8: dept = "Product Management"; break;
         case 9: dept = "Legal"; break;
-        default: System.out.println("Invalid department choice."); return "";
     }
 
+
+    String position = "";
+    System.out.println("Select a New position for " + dept + ": ");
+    int posChoice = 0;
     
-    System.out.println("Select a position for " + dept + ": ");
 
-    switch (dept) {
-        case "Finance":
-            System.out.println("1. Accountant");
-            System.out.println("2. Financial Analyst");
-            System.out.println("3. CFO");
-            break;
-        case "Marketing":
-            System.out.println("1. Marketing Specialist");
-            System.out.println("2. Marketing Manager");
-            System.out.println("3. Chief Marketing Officer");
-            break;
-        case "Sales":
-            System.out.println("1. Sales Representative");
-            System.out.println("2. Sales Manager");
-            System.out.println("3. Regional Sales Director");
-            break;
-        case "Executive":
-            System.out.println("1. CEO");
-            System.out.println("2. COO");
-            break;
-        case "Information Technology":
-            System.out.println("1. IT Specialist");
-            System.out.println("2. System Administrator");
-            System.out.println("3. IT Manager");
-            break;
-        case "Customer Service":
-            System.out.println("1. Customer Service Representative");
-            System.out.println("2. Customer Service Supervisor");
-            break;
-        case "Administrative":
-            System.out.println("1. Office Assistant");
-            System.out.println("2. Administrative Manager");
-            break;
-        case "Product Management":
-            System.out.println("1. Product Manager");
-            System.out.println("2. Senior Product Manager");
-            break;
-        case "Legal":
-            System.out.println("1. Legal Counsel");
-            System.out.println("2. Legal Assistant");
-            break;
-        default:
-            System.out.println("Invalid department choice.");
-            return "";
+    while (true) {
+
+        switch (dept) {
+            case "Finance":
+                System.out.println("1. Accountant");
+                System.out.println("2. Financial Analyst");
+                System.out.println("3. CFO");
+                break;
+            case "Marketing":
+                System.out.println("1. Marketing Specialist");
+                System.out.println("2. Marketing Manager");
+                System.out.println("3. Chief Marketing Officer");
+                break;
+            case "Sales":
+                System.out.println("1. Sales Representative");
+                System.out.println("2. Sales Manager");
+                System.out.println("3. Regional Sales Director");
+                break;
+            case "Executive":
+                System.out.println("1. CEO");
+                System.out.println("2. COO");
+                break;
+            case "Information Technology":
+                System.out.println("1. IT Specialist");
+                System.out.println("2. System Administrator");
+                System.out.println("3. IT Manager");
+                break;
+            case "Customer Service":
+                System.out.println("1. Customer Service Representative");
+                System.out.println("2. Customer Service Supervisor");
+                break;
+            case "Administrative":
+                System.out.println("1. Office Assistant");
+                System.out.println("2. Administrative Manager");
+                break;
+            case "Product Management":
+                System.out.println("1. Product Manager");
+                System.out.println("2. Senior Product Manager");
+                break;
+            case "Legal":
+                System.out.println("1. Legal Counsel");
+                System.out.println("2. Legal Assistant");
+                break;
+        }
+
+        System.out.print(": ");
+        if (sc.hasNextInt()) {
+            posChoice = sc.nextInt();
+            sc.nextLine();
+
+            if ((dept.equals("Executive") && posChoice >= 1 && posChoice <= 2) || 
+                (dept.equals("Finance") && posChoice >= 1 && posChoice <= 3) || 
+                (dept.equals("Marketing") && posChoice >= 1 && posChoice <= 3) ||
+                (dept.equals("Sales") && posChoice >= 1 && posChoice <= 3) ||
+                (dept.equals("Information Technology") && posChoice >= 1 && posChoice <= 3) ||
+                (dept.equals("Customer Service") && posChoice >= 1 && posChoice <= 2) ||
+                (dept.equals("Administrative") && posChoice >= 1 && posChoice <= 2) ||
+                (dept.equals("Product Management") && posChoice >= 1 && posChoice <= 2) ||
+                (dept.equals("Legal") && posChoice >= 1 && posChoice <= 2)) {
+                break; 
+            } else {
+                System.out.println("Invalid position choice. Please select a valid number.");
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine(); 
+        }
     }
-
-    System.out.print(": ");
-    int posChoice = sc.nextInt();
-    sc.nextLine();
 
   
     switch (dept) {
@@ -337,15 +372,10 @@ public String DeptandPosi() {
         case "Legal":
             position = (posChoice == 1) ? "Legal Counsel" : "Legal Assistant";
             break;
-        default:
-            System.out.println("Invalid position choice.");
-            return "";
     }
 
-    
     return dept + ": " + position;
 }
-
 
 
 public int Rate() {
@@ -498,12 +528,9 @@ public String validateHireDate() {
         return getNum;
     }
     
-    
-    public String UpdateDeptandPosi() {
-    
+  public String UpdateDeptandPosi() {
     Scanner sc = new Scanner(System.in);
-    
-    
+
     System.out.println("Select Employee's New Department:");
     System.out.println("1. Finance");
     System.out.println("2. Marketing");
@@ -514,15 +541,27 @@ public String validateHireDate() {
     System.out.println("7. Administrative");
     System.out.println("8. Product Management");
     System.out.println("9. Legal");
-    
-    System.out.print(": ");
-    int deptChoice = sc.nextInt();
-    sc.nextLine(); 
-    
-    String dept = "";
-    String position = "";
 
-   
+    System.out.print(": ");
+    int deptChoice = 0;
+    String dept = "";
+    
+    while (true) {
+        if (sc.hasNextInt()) {
+            deptChoice = sc.nextInt();
+            sc.nextLine(); 
+            
+            if (deptChoice >= 1 && deptChoice <= 9) {
+                break;
+            } else {
+                System.out.println("Invalid department choice. Please choose a number between 1 and 9.");
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine(); 
+        }
+    }
+
     switch (deptChoice) {
         case 1: dept = "Finance"; break;
         case 2: dept = "Marketing"; break;
@@ -533,63 +572,83 @@ public String validateHireDate() {
         case 7: dept = "Administrative"; break;
         case 8: dept = "Product Management"; break;
         case 9: dept = "Legal"; break;
-        default: System.out.println("Invalid department choice."); return "";
     }
 
-    
     System.out.println("Select a New position for " + dept + ": ");
+    int posChoice = 0;
+    String position = "";
 
-    switch (dept) {
-        case "Finance":
-            System.out.println("1. Accountant");
-            System.out.println("2. Financial Analyst");
-            System.out.println("3. CFO");
-            break;
-        case "Marketing":
-            System.out.println("1. Marketing Specialist");
-            System.out.println("2. Marketing Manager");
-            System.out.println("3. Chief Marketing Officer");
-            break;
-        case "Sales":
-            System.out.println("1. Sales Representative");
-            System.out.println("2. Sales Manager");
-            System.out.println("3. Regional Sales Director");
-            break;
-        case "Executive":
-            System.out.println("1. CEO");
-            System.out.println("2. COO");
-            break;
-        case "Information Technology":
-            System.out.println("1. IT Specialist");
-            System.out.println("2. System Administrator");
-            System.out.println("3. IT Manager");
-            break;
-        case "Customer Service":
-            System.out.println("1. Customer Service Representative");
-            System.out.println("2. Customer Service Supervisor");
-            break;
-        case "Administrative":
-            System.out.println("1. Office Assistant");
-            System.out.println("2. Administrative Manager");
-            break;
-        case "Product Management":
-            System.out.println("1. Product Manager");
-            System.out.println("2. Senior Product Manager");
-            break;
-        case "Legal":
-            System.out.println("1. Legal Counsel");
-            System.out.println("2. Legal Assistant");
-            break;
-        default:
-            System.out.println("Invalid department choice.");
-            return "";
+    while (true) {
+        
+        switch (dept) {
+            case "Finance":
+                System.out.println("1. Accountant");
+                System.out.println("2. Financial Analyst");
+                System.out.println("3. CFO");
+                break;
+            case "Marketing":
+                System.out.println("1. Marketing Specialist");
+                System.out.println("2. Marketing Manager");
+                System.out.println("3. Chief Marketing Officer");
+                break;
+            case "Sales":
+                System.out.println("1. Sales Representative");
+                System.out.println("2. Sales Manager");
+                System.out.println("3. Regional Sales Director");
+                break;
+            case "Executive":
+                System.out.println("1. CEO");
+                System.out.println("2. COO");
+                break;
+            case "Information Technology":
+                System.out.println("1. IT Specialist");
+                System.out.println("2. System Administrator");
+                System.out.println("3. IT Manager");
+                break;
+            case "Customer Service":
+                System.out.println("1. Customer Service Representative");
+                System.out.println("2. Customer Service Supervisor");
+                break;
+            case "Administrative":
+                System.out.println("1. Office Assistant");
+                System.out.println("2. Administrative Manager");
+                break;
+            case "Product Management":
+                System.out.println("1. Product Manager");
+                System.out.println("2. Senior Product Manager");
+                break;
+            case "Legal":
+                System.out.println("1. Legal Counsel");
+                System.out.println("2. Legal Assistant");
+                break;
+        }
+
+        System.out.print(": ");
+        if (sc.hasNextInt()) {
+            posChoice = sc.nextInt();
+            sc.nextLine(); 
+            
+           
+            if ((dept.equals("Executive") && posChoice >= 1 && posChoice <= 2) || 
+                (dept.equals("Finance") && posChoice >= 1 && posChoice <= 3) || 
+                (dept.equals("Marketing") && posChoice >= 1 && posChoice <= 3) ||
+                (dept.equals("Sales") && posChoice >= 1 && posChoice <= 3) ||
+                (dept.equals("Information Technology") && posChoice >= 1 && posChoice <= 3) ||
+                (dept.equals("Customer Service") && posChoice >= 1 && posChoice <= 2) ||
+                (dept.equals("Administrative") && posChoice >= 1 && posChoice <= 2) ||
+                (dept.equals("Product Management") && posChoice >= 1 && posChoice <= 2) ||
+                (dept.equals("Legal") && posChoice >= 1 && posChoice <= 2)) {
+                break; 
+            } else {
+                System.out.println("Invalid position choice. Please select a valid number.");
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine();
+        }
     }
 
-    System.out.print(": ");
-    int posChoice = sc.nextInt();
-    sc.nextLine();
 
-  
     switch (dept) {
         case "Finance":
             position = (posChoice == 1) ? "Accountant" : (posChoice == 2) ? "Financial Analyst" : "CFO";
@@ -618,15 +677,11 @@ public String validateHireDate() {
         case "Legal":
             position = (posChoice == 1) ? "Legal Counsel" : "Legal Assistant";
             break;
-        default:
-            System.out.println("Invalid position choice.");
-            return "";
     }
 
-    
     return dept + ": " + position;
- }
-    
+}
+
 
     public int validateint(String input) {
         Scanner sc = new Scanner(System.in);
