@@ -6,6 +6,8 @@ import EmpApp.config;
 import static EmpApp.config.connectDB;
 import EmpApp.validation;
 import employees.employees;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,6 +26,73 @@ public class Record {
         
     Scanner sc = new Scanner(System.in);
     
+    
+
+
+    public void importDataToDatabase(String csvFilePath) {
+        String selectQuery = "SELECT COUNT(*) FROM DailyTimeRecords WHERE employee_id = ? AND entry_date = ?";
+        String insertQuery = "INSERT INTO DailyTimeRecords (employee_id, entry_date, time_in, time_out, month, hours_worked, overtime_hrs, absent) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        
+
+        try (Connection conn = config.connectDB();
+             PreparedStatement selectStmt = conn.prepareStatement(selectQuery);
+             PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+             BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+
+            String line;
+            br.readLine(); 
+
+            while ((line = br.readLine()) != null) {
+                String[] record = line.split(",");
+
+            
+                if (record.length != 8) {
+                    System.out.println("Skipping invalid record: " + line);
+                    continue;
+                }
+
+          
+                int empId = Integer.parseInt(record[0].trim());
+                String entryDate = record[1].trim();
+                String timeIn = record[2].trim();
+                String timeOut = record[3].trim();
+                String month = record[4].trim();
+                double hoursWorked = Double.parseDouble(record[5].trim());
+                int overtimeHrs = Integer.parseInt(record[6].trim());
+                String absent = record[7].trim();
+
+ 
+                selectStmt.setInt(1, empId);
+                selectStmt.setString(2, entryDate);
+
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    rs.next();
+                    if (rs.getInt(1) > 0) {
+                        System.out.println("Skipping existing record for employee ID: " + empId + " on date: " + entryDate);
+                        continue;
+                    }
+                }
+
+                insertStmt.setInt(1, empId);
+                insertStmt.setString(2, entryDate);
+                insertStmt.setString(3, timeIn);
+                insertStmt.setString(4, timeOut);
+                insertStmt.setString(5, month);
+                insertStmt.setDouble(6, hoursWorked);
+                insertStmt.setInt(7, overtimeHrs);
+                insertStmt.setString(8, absent);
+
+                insertStmt.executeUpdate();
+                System.out.println("Inserted new record for employee ID: " + empId + "for the Month of: "+ month);
+            }
+            System.out.println("DailyTimeRecord.csv data imported completed successfully!");
+
+        } catch (Exception e) {
+            System.out.println("Error during CSV import: " + e.getMessage());
+        }
+    }
+
     
   public void AddDTR() {
     Scanner sc = new Scanner(System.in);  
@@ -607,7 +676,7 @@ public class Record {
             System.out.println("*             Daily Time Record               *");
             System.out.println("***********************************************");
             System.out.println();
-            System.out.println("1. Add Daily Time Record");
+            System.out.println("1. Import Daily Time Record");
             System.out.println("2. View Daily Time Records");
             System.out.println("3. Edit Daily Time Record");
             System.out.println("4. Delete Daily Time Record");
@@ -624,9 +693,12 @@ public class Record {
         switch(actn){
             
             case 1:
-                viewEmployeesv2();
-                System.out.print("\n\n");
-                AddDTR();
+            
+                 String DataFilePath = "D:\\College\\MySys\\IT2C-TAPALES-HRS\\src\\DailyTimeRecords\\DailyTimeRecords.csv";
+                 importDataToDatabase(DataFilePath);
+//                viewEmployeesv2();
+//                System.out.print("\n\n");
+//                AddDTR();
                 break;
             
             case 2:
