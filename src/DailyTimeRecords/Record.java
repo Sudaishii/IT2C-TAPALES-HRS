@@ -84,7 +84,7 @@ public class Record {
                 insertStmt.setString(8, absent);
 
                 insertStmt.executeUpdate();
-                System.out.println("Inserted new record for employee ID: " + empId + "for the Month of: "+ month);
+                System.out.println("Inserted new record for employee ID: " + empId + " on the month: "+ month);
             }
             System.out.println("DailyTimeRecord.csv data imported completed successfully!");
 
@@ -678,9 +678,7 @@ public class Record {
             System.out.println();
             System.out.println("1. Import Daily Time Record");
             System.out.println("2. View Daily Time Records");
-            System.out.println("3. Edit Daily Time Record");
-            System.out.println("4. Delete Daily Time Record");
-            System.out.println("5. Exit");
+            System.out.println("3. Back to Main Menu");
             System.out.println();
             System.out.println("***********************************************");
             System.out.println();
@@ -693,9 +691,10 @@ public class Record {
         switch(actn){
             
             case 1:
-            
-                 String DataFilePath = "D:\\College\\MySys\\IT2C-TAPALES-HRS\\src\\DailyTimeRecords\\DailyTimeRecords.csv";
-                 importDataToDatabase(DataFilePath);
+                 
+                System.out.print("Enter Local Directory Path of thte File you want to import (.csv): ");
+                String DataFilePath = sc.nextLine();
+                importDataToDatabase(DataFilePath);
 //                viewEmployeesv2();
 //                System.out.print("\n\n");
 //                AddDTR();
@@ -707,20 +706,20 @@ public class Record {
                 viewRecords();
                 break;
                
-            case 3:
-            viewEmployeesv2();
-            if (!updateRecord()) {
-                System.out.print("");
-            }
-            break;
-                
-            case 4:
-                
-                viewEmployeesv2();
-                deleteRecord();
-                break;
-                
-            case 5:
+//            case 3:
+//            viewEmployeesv2();
+//            if (!updateRecord()) {
+//                System.out.print("");
+//            }
+//            break;
+//                
+//            case 4:
+//                
+//                viewEmployeesv2();
+//                deleteRecord();
+//                break;
+//                
+            case  3:
                 selected = true;
                 System.out.println("Going back . . .");
                 break;

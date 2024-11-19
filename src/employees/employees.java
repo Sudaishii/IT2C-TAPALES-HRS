@@ -69,36 +69,46 @@ public class employees {
         config conf = new config();
         
         
-        System.out.print("Enter Employee's First Name: ");
+        System.out.print("Enter Emmployee's Name (or enter 'X' to cancel): ");
         String fname = val.validateName();
+         if ("EXIT".equals(fname)) return;
         
-        System.out.print("Enter Employee's Last Name: ");
+        System.out.print("Enter Employee's Last Name (or enter 'X' to cancel): ");
         String lname = val.validateName();
+        if ("EXIT".equals(lname)) return;
         
-        System.out.print("Enter Employee's Address: ");
+       
         String addrss = val.validateAddress();
+         if ("EXIT".equals(addrss)) return;
         
-        System.out.print("Enter Employee's Email Address: ");
+        System.out.print("Enter Employee's Email Address (or enter 'X' to cancel): ");
         String email = val.validateEmail();
-           
-        System.out.print("Enter Employee's Contact Number: ");
-        String num = val.validateconNum();
+        if ("EXIT".equals(email)) return;
         
-        System.out.print("Enter Employee's Hire Date (yyyy-MM-dd): ");
+        System.out.print("Enter Employee's Contact Number (or enter 'X' to cancel): ");
+        String num = val.validateconNum();
+        if ("EXIT".equals(email)) return;
+        
+        System.out.print("Enter Employee's Hire Date (yyyy-MM-dd or enter 'X' to cancel): ");
         String hdate = val.validateHireDate();
+        if ("EXIT".equals(hdate)) return;
         
         String deptAndPos = val.AddDeptandPosi();
+        if ("EXIT".equals(deptAndPos)) return;  
         String[] deptPosArray = deptAndPos.split(":");
-        String dept = deptPosArray[0].trim();
-        String pos = deptPosArray[1].trim();
-
+        
+        String dept = null;
+        String pos = null;
+        
+        if (deptPosArray.length == 2) { 
+            dept = deptPosArray[0].trim();
+            pos = deptPosArray[1].trim();
+        }
 
         
-        System.out.print("Enter Employee's Rate (per hour): ");
         int rate = val.Rate();
-
-       
-
+        if (rate == -1) return;
+        
         String sql = "INSERT INTO tbl_employees (emp_fname, emp_lname, emp_add, emp_email, emp_contactnum, emp_hdate, emp_dept, emp_position, emp_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
@@ -116,6 +126,34 @@ public class employees {
         cfg.viewRecords(emp_dtls, emp_hdrs, emp_clmn);
         
     }
+    
+    private int getEmployeeId(validation val) {
+        
+    Scanner oha = new Scanner(System.in);     
+    int id;
+    while (true) {
+        System.out.print("Enter Employee ID (or enter 'X' to cancel): ");
+        
+        id = val.validateIntOrX();
+
+        if (id == -1) {
+            System.out.println("Operation canceled.");
+            return -1; 
+        }
+
+        if (id == -2) {
+            System.out.println("\tERROR: Invalid input. Please enter a valid number or 'X' to cancel.");
+            continue;  
+        }
+
+        if (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) > 0) {
+            break;  
+        } else {
+            System.out.println("\tERROR: ID doesn't exist, try again.");
+        }
+    }
+    return id;
+}
     
     public void updateEmployees() {
         
@@ -142,7 +180,7 @@ public class employees {
         int choice = val.validateChoice();
         
         int id;
-        String email, contact, dept, post, add;
+        String email, contact, dept, post, add = "";
          String deptAndPos;
          String[] deptPosArray;
         
@@ -151,33 +189,57 @@ public class employees {
         switch(choice){
             
             case 1: 
-                
-                System.out.print("Enter Employee ID: ");
-                id = val.validateInt();
-                
-                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
-                System.out.print("\tERROR: ID doesn't exist, try again: ");
-                id = val.validateInt();
+                     
+         System.out.print("Enter Employee ID to be Updated (enter 'X' to cancel): ");
+         id = val.validateInt(); 
+
+        if (id == -1) {
+            System.out.println("\tProcess canceled!");
+            return;
+        }
+
+      
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+            System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
+            id = val.validateInt();
+            if (id == -1) {
+                System.out.println("\tProcess canceled!");
+                return;
             }
-                
-                System.out.print("Enter New Address: ");
-                add = val.validateAddress();
-                
-                String sqlUpdateAdd = "UPDATE tbl_employees SET emp_add = ? WHERE emp_id = ?";
-                
-                cfg.updateEmployee(sqlUpdateAdd, add, id);
+        }
+
+       
+        String address = val.validateAddress();
+        if (address.equals("EXIT")) {
+            System.out.println("Address entry canceled. Returning to the previous menu.");
+            return; 
+        }
+
+       
+        String sqlUpdateAdd = "UPDATE tbl_employees SET emp_add = ? WHERE emp_id = ?";
+        cfg.updateEmployee(sqlUpdateAdd, address, id);
                 
                 break;
              
             case 2:
                  
-                System.out.print("Enter Employee ID: ");
-                id = val.validateInt();
-                
-                while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
-                System.out.print("\tERROR: ID doesn't exist, try again: ");
-                id = val.validateInt();
+                 System.out.print("Enter Employee ID to be Updated (enter 'X' to cancel): ");
+                id = val.validateInt(); 
+
+               if (id == -1) {
+                   System.out.println("\tProcess canceled!");
+                   return;
+               }
+
+      
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+            System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
+            id = val.validateInt();
+            if (id == -1) {
+                System.out.println("\tProcess canceled!");
+                return;
             }
+        }
                 
                 System.out.print("Enter New Email Address: ");
                 email = val.validateEmail();
@@ -271,11 +333,28 @@ public class employees {
                 
             } 
             
-        }while(!selected);
-        
-           
-    
+        }while(!selected);  
 }   
+
+       public static void updateAddress() {
+           
+          validation val = new validation();
+          Scanner sc = new Scanner(System.in);
+           
+        System.out.print("Enter Employee ID to be Updated (enter 'X' to cancel): ");
+        String employeeId = sc.nextLine().trim();
+
+        if (employeeId.equalsIgnoreCase("X")) {
+            System.out.println("\tProcess canceled!");
+            return;
+        }
+
+        String address = val.validateAddress();
+        if (!address.equals("EXIT")) {
+            System.out.println("Employee ID " + employeeId + " address updated to: " + address);
+        }
+    }
+    
      public void deleteEmployees() {
         Scanner sc = new Scanner(System.in);
         validation val = new validation();

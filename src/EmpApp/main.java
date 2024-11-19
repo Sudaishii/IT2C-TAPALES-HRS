@@ -1,6 +1,6 @@
 package EmpApp;
 
-import CSV_Test.test;
+
 import DailyTimeRecords.Record;
 import EmpApp.config.*;
 import static EmpApp.config.connectDB;
@@ -58,9 +58,13 @@ public class main {
                     rcrd.DailyTimeRecord();
                     break;
                     
+                            
+                            
              case 3:
                  rpt.Report();
                  break;
+                 
+                         
                  
                          
              case 4:
