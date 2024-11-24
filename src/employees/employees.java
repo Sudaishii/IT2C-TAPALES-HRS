@@ -188,13 +188,14 @@ public class employees {
         
         switch(choice){
             
-            case 1: 
-                     
+         case 1: 
+         System.out.println("\n\nListing Employees . . .");
+         viewEmployees();           
          System.out.print("Enter Employee ID to be Updated (enter 'X' to cancel): ");
          id = val.validateInt(); 
 
         if (id == -1) {
-            System.out.println("\tProcess canceled!");
+            
             return;
         }
 
@@ -203,7 +204,7 @@ public class employees {
             System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
             id = val.validateInt();
             if (id == -1) {
-                System.out.println("\tProcess canceled!");
+                
                 return;
             }
         }
@@ -218,11 +219,12 @@ public class employees {
        
         String sqlUpdateAdd = "UPDATE tbl_employees SET emp_add = ? WHERE emp_id = ?";
         cfg.updateEmployee(sqlUpdateAdd, address, id);
-                
+                viewEmployees();
                 break;
              
             case 2:
-                 
+                System.out.println("\n\nListing Employees . . .");
+                 viewEmployees(); 
                  System.out.print("Enter Employee ID to be Updated (enter 'X' to cancel): ");
                 id = val.validateInt(); 
 
@@ -247,11 +249,12 @@ public class employees {
                 String sqlUpdateEmail = "UPDATE tbl_employees SET emp_email = ? WHERE emp_id = ?";
                 
                 cfg.updateEmployee(sqlUpdateEmail, email, id);
-                
+                viewEmployees();
                 break;
                 
             case 3: 
-                
+                System.out.println("\n\nListing Employees . . .");
+                viewEmployees(); 
                 System.out.print("Enter Employee ID: ");
                 id = val.validateInt();
                 
@@ -259,18 +262,19 @@ public class employees {
                 System.out.print("\tERROR: ID doesn't exist, try again: ");
                 id = val.validateInt();
             }
-                
+               
                 System.out.print("Enter New Contact Number: ");
                 contact = val.validateconNum();
                 
                 String sqlUpdateNum = "UPDATE tbl_employees SET emp_contactnum = ? WHERE emp_id = ?";
                 
                 cfg.updateEmployee(sqlUpdateNum, contact, id);
-                
+                viewEmployees();
                 break;
                 
             case 4:
-                
+                System.out.println("\n\nListing Employees . . .");
+                viewEmployees(); 
                System.out.print("Enter Employee ID: ");
                 id = val.validateInt();
                 
@@ -286,12 +290,13 @@ public class employees {
                 
                 String sqlUpdateDept = "UPDATE tbl_employees SET emp_dept = ?, emp_position = ? WHERE emp_id = ?";
                 cfg.updateEmployee(sqlUpdateDept, dept, post, id);
-                
+                viewEmployees();
                 break;
              
                 
             case 5:
-                
+                System.out.println("\n\nListing Employees . . .");
+                viewEmployees(); 
                 System.out.print("Enter Employee ID: ");
                 id = val.validateInt();
                 
@@ -319,10 +324,12 @@ public class employees {
                 
                 
                 cfg.updateEmployee(sqlUpdate, add, email, contact, dept, post, id);
+                viewEmployees();
                 break;
             
             case 6:
-                
+                System.out.println("\n\nListing Employees . . .");
+                viewEmployees(); 
                 selected = true;
                 System.out.println("Going Back . . .");
                 break;
@@ -360,13 +367,25 @@ public class employees {
         validation val = new validation();
         config cfg = new config();
         
-        System.out.print("Enter the ID you want to delete: ");
+        viewEmployees();
+    
+        System.out.print("Enter the ID you want to delete (or Enter 'X' to cancel): ");
         int id = val.validateInt();
         
-         while(getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0){
-                System.out.print("\tERROR: ID doesn't exist, try again: ");
-                id = val.validateInt();
-         }
+         if (id == -1) {
+            System.out.println("\tProcess canceled!");
+            return;
+        }
+
+      
+        while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+            System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
+            id = val.validateInt();
+            if (id == -1) {
+                System.out.println("\tProcess canceled!");
+                return;
+            }
+        }
         
         String sqlDelete = "DELETE FROM tbl_employees WHERE emp_id = ?";
 
@@ -415,19 +434,16 @@ public class employees {
                 break;
                 
             case 3: 
-                
-                 System.out.println("\n\nListing Employees . . .");
-                 use.viewEmployees();
+               
                  use.updateEmployees();
                  System.out.println("\n\nListing Updated Employees Details . . .");
-                 use.viewEmployees();
+                 
                 break;
                 
             case 4: 
                 
-                use.viewEmployees();
+          
                 use.deleteEmployees();
-                use.viewEmployees();
                 break;
                 
             case 5:

@@ -570,7 +570,7 @@ public String validateHireDate() {
 
             
             if (input.equalsIgnoreCase("X")) {
-                System.out.println("Process canceled!");
+                System.out.println("\tProcess canceled!");
                 return -1;  
             }
 
@@ -589,7 +589,7 @@ public String validateHireDate() {
   public String UpdateDeptandPosi() {
     Scanner sc = new Scanner(System.in);
 
-    System.out.println("Select Employee's Department:");
+    System.out.println("Select New Employee's Department:");
     System.out.println("1. Finance");
     System.out.println("2. Marketing");
     System.out.println("3. Sales");
@@ -632,7 +632,7 @@ public String validateHireDate() {
         case 9: dept = "Legal"; break;
     }
 
-    System.out.println("Select a position for " + dept + ": ");
+    System.out.println("Select a New position for " + dept + ": ");
     int posChoice = 0;
     String position = "";
 

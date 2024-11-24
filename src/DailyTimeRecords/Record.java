@@ -13,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Scanner;
 import java.time.LocalDate;
@@ -29,14 +30,17 @@ public class Record {
     
 
 
-    public void importDataToDatabase(String csvFilePath) {
-        String selectQuery = "SELECT COUNT(*) FROM DailyTimeRecords WHERE employee_id = ? AND entry_date = ?";
-        String insertQuery = "INSERT INTO DailyTimeRecords (employee_id, entry_date, time_in, time_out, month, hours_worked, overtime_hrs, absent) " +
-                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        
+  
 
-        try (Connection conn = config.connectDB();
-             PreparedStatement selectStmt = conn.prepareStatement(selectQuery);
+public void importDataToDatabase(String csvFilePath) {
+    String selectQuery = "SELECT COUNT(*) FROM DailyTimeRecords WHERE employee_id = ? AND entry_date = ?";
+    String insertQuery = "INSERT INTO DailyTimeRecords (employee_id, entry_date, time_in, time_out, month, hours_worked, overtime_hrs, absent) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection conn = config.connectDB()) {
+        conn.setAutoCommit(false);
+
+        try (PreparedStatement selectStmt = conn.prepareStatement(selectQuery);
              PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
              BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
 
@@ -46,52 +50,69 @@ public class Record {
             while ((line = br.readLine()) != null) {
                 String[] record = line.split(",");
 
-            
                 if (record.length != 8) {
                     System.out.println("Skipping invalid record: " + line);
                     continue;
                 }
 
-          
-                int empId = Integer.parseInt(record[0].trim());
-                String entryDate = record[1].trim();
-                String timeIn = record[2].trim();
-                String timeOut = record[3].trim();
-                String month = record[4].trim();
-                double hoursWorked = Double.parseDouble(record[5].trim());
-                int overtimeHrs = Integer.parseInt(record[6].trim());
-                String absent = record[7].trim();
+                try {
+                    int empId = Integer.parseInt(record[0].trim());
+                    String entryDate = formatDate(record[1].trim());
+                    String timeIn = record[2].trim();
+                    String timeOut = record[3].trim();
+                    String month = record[4].trim();
+                    double hoursWorked = Double.parseDouble(record[5].trim());
+                    int overtimeHrs = Integer.parseInt(record[6].trim());
+                    String absent = record[7].trim();
 
- 
-                selectStmt.setInt(1, empId);
-                selectStmt.setString(2, entryDate);
+                 
+                    selectStmt.setInt(1, empId);
+                    selectStmt.setString(2, entryDate);
 
-                try (ResultSet rs = selectStmt.executeQuery()) {
-                    rs.next();
-                    if (rs.getInt(1) > 0) {
-                        System.out.println("Skipping existing record for employee ID: " + empId + " on date: " + entryDate);
-                        continue;
+                    try (ResultSet rs = selectStmt.executeQuery()) {
+                        rs.next();
+                        if (rs.getInt(1) > 0) {
+                            System.out.println("Skipping existing record for employee ID: " + empId + " on date: " + entryDate);
+                            continue;
+                        }
                     }
+
+                   
+                    insertStmt.setInt(1, empId);
+                    insertStmt.setString(2, entryDate);
+                    insertStmt.setString(3, timeIn);
+                    insertStmt.setString(4, timeOut);
+                    insertStmt.setString(5, month);
+                    insertStmt.setDouble(6, hoursWorked);
+                    insertStmt.setInt(7, overtimeHrs);
+                    insertStmt.setString(8, absent);
+
+                    insertStmt.executeUpdate();
+                    System.out.println("Inserted new record for employee ID: " + empId + " on the month: " + month);
+
+                } catch (Exception e) {
+                    System.out.println("Error in record processing: " + line + " | Error: " + e.getMessage());
                 }
-
-                insertStmt.setInt(1, empId);
-                insertStmt.setString(2, entryDate);
-                insertStmt.setString(3, timeIn);
-                insertStmt.setString(4, timeOut);
-                insertStmt.setString(5, month);
-                insertStmt.setDouble(6, hoursWorked);
-                insertStmt.setInt(7, overtimeHrs);
-                insertStmt.setString(8, absent);
-
-                insertStmt.executeUpdate();
-                System.out.println("Inserted new record for employee ID: " + empId + " on the month: "+ month);
             }
-            System.out.println("DailyTimeRecord.csv data imported completed successfully!");
+
+            conn.commit();
+            System.out.println("DailyTimeRecord.csv data import completed successfully!");
 
         } catch (Exception e) {
-            System.out.println("Error during CSV import: " + e.getMessage());
+            conn.rollback();
+            System.out.println("Error during CSV import, transaction rolled back: " + e.getMessage());
         }
+    } catch (Exception e) {
+        System.out.println("Database connection error: " + e.getMessage());
     }
+}
+
+
+private String formatDate(String csvDate) throws Exception {
+    SimpleDateFormat csvFormat = new SimpleDateFormat("MM/dd/yyyy");
+    SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
+    return dbFormat.format(csvFormat.parse(csvDate));
+}
 
     
   public void AddDTR() {
@@ -214,6 +235,7 @@ public class Record {
     }
     
     public void viewEmployeesv2(){
+        
         config cfg = new config();
         
         String emp_dtls = "select * from tbl_employees";
@@ -335,17 +357,22 @@ public class Record {
 
      try {
 
-         System.out.print("Enter the Employee's ID you want to Sort: ");
-         String idInput = sc.nextLine();
-         int id = val.validateint(idInput);
+         System.out.print("Enter the Employee's ID you want to Sort : ");
+            int id = val.validateInt();
 
-         while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
-             System.out.print("\tERROR: ID doesn't exist, try again: ");
-             idInput = sc.nextLine();
-             id = val.validateint(idInput);
-             
-         }
-         
+             if (id == -1) {
+                return false;
+            }
+
+
+            while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+                System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
+                id = val.validateInt();
+                if (id == -1) {
+                    return false;
+                }
+            }
+               
          String month = validateMonthInput(sc);
 
          String recordQuery = "SELECT * FROM DailyTimeRecords WHERE employee_id = ? AND month = ?";
@@ -692,7 +719,7 @@ public class Record {
             
             case 1:
                  
-                System.out.print("Enter Local Directory Path of thte File you want to import (.csv): ");
+                System.out.print("Enter Local Directory Path of thte File you want to import (.csv ): ");
                 String DataFilePath = sc.nextLine();
                 importDataToDatabase(DataFilePath);
 //                viewEmployeesv2();
