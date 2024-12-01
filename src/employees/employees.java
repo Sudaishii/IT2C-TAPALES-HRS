@@ -77,7 +77,14 @@ public class employees {
         String lname = val.validateName();
         if ("EXIT".equals(lname)) return;
         
-       
+         System.out.print("Enter Employee's Age (or -1 to cancel): ");
+         int age = val.validateAge();
+         if (age == -1) return;
+
+        System.out.print("Enter Employee's Gender (M/F or 'X' to cancel): ");
+        String gender = val.validateGender();
+        if ("EXIT".equals(gender)) return;
+        
         String addrss = val.validateAddress();
          if ("EXIT".equals(addrss)) return;
         
@@ -87,7 +94,7 @@ public class employees {
         
         System.out.print("Enter Employee's Contact Number (or enter 'X' to cancel): ");
         String num = val.validateconNum();
-        if ("EXIT".equals(email)) return;
+        if ("EXIT".equals(num)) return;
         
         System.out.print("Enter Employee's Hire Date (yyyy-MM-dd or enter 'X' to cancel): ");
         String hdate = val.validateHireDate();

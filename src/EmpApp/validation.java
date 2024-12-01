@@ -78,7 +78,31 @@ public class validation {
         }
     }
 
-
+     public String validateGender() {
+    while (true) {
+        System.out.print("Enter gender (M/F or 'X' to cancel): ");
+        String input = sc.nextLine().trim().toUpperCase();
+        if ("X".equals(input)) return "EXIT";
+        if (input.equals("M") || input.equals("F")) return input; 
+        System.out.println("Invalid gender. Please enter M (Male) or F (Female).");
+         }
+        }
+     
+     
+     public int validateAge() {
+    while (true) {
+        System.out.print("Enter age (or -1 to cancel): ");
+        try {
+            int age = Integer.parseInt(sc.nextLine().trim());
+            if (age == -1) return -1;
+            if (age >= 18 && age <= 65) return age; // Adjust range as needed
+            System.out.println("Age must be between 18 and 65.");
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+        }
+    }
+}
+     
 private String capitalizeWord(String word) {
     if (word.isEmpty()) return "";
     return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
@@ -579,7 +603,7 @@ public String validateHireDate() {
                 getNum = Integer.parseInt(input);
                 break;  
             } catch (NumberFormatException e) {
-                System.out.print("Invalid Input: Must only be a number, try again: ");
+                System.out.print("Invalid Input: Must only be a number, try again (or Enter 'X' to cancel): ");
             }
         }
         return getNum;  

@@ -32,7 +32,7 @@ import java.util.Set;
     Scanner sc = new Scanner(System.in);
     validation val = new validation();
    
-    System.out.print("Enter Report ID (enter 'X' to cancel: ");
+    System.out.print("Enter Report ID (enter 'X' to cancel): ");
      int reportId = val.validateInt();
 
              if (reportId == -1) {
@@ -41,7 +41,7 @@ import java.util.Set;
             }
 
 
-            while (getSingleValue("SELECT report_id FROM reports WHERE emp_id = ?", reportId) == 0) {
+            while (getSingleValue("SELECT report_id FROM reports WHERE report_id = ?", reportId) == 0) {
                 System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
                 reportId = val.validateInt();
                 if (reportId == -1) {
@@ -177,7 +177,6 @@ import java.util.Set;
    
 
    public void viewGeneratedReports() {
-       
     Scanner sc = new Scanner(System.in);
     validation val = new validation();
 
@@ -195,16 +194,17 @@ import java.util.Set;
                  + "FROM reports r "
                  + "JOIN tbl_employees e ON r.emp_id = e.emp_id ";
     String month = null;
+    String dept = null;
+    int empId = -1;
 
     try {
         switch (choice) {
             case 1:
-           
                 Record rcrd = new Record();
                 rcrd.viewEmployeesv2();
 
                 System.out.print("Enter Employee ID (or press 'X' to cancel): ");
-                int empId = val.validateInt();
+                empId = val.validateInt();
 
                 if (empId == -1) {
                     return;
@@ -214,7 +214,6 @@ import java.util.Set;
                     System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
                     empId = val.validateInt();
                     if (empId == -1) {
-
                         return;
                     }
                 }
@@ -223,54 +222,47 @@ import java.util.Set;
                 break;
 
             case 2:
-               
                 month = validateMonthInput(sc);
-                  if (month.equals("EXIT")){ 
-                      return;
-                  }      
+                if (month.equalsIgnoreCase("EXIT")) {
+                    return;
+                }
                 query += "WHERE r.month = ? ";
                 break;
 
             case 3:
-                
-                String dept = selectDepartment();
-                    if (dept == null) { 
-                        System.out.println("\tProcess Canceled!");
+                dept = selectDepartment();
+                if (dept == null) {
+                    
+                    return;
+                }
+
+                query += "WHERE e.emp_dept = ? ";
+
+                System.out.print("Do you want to filter by Month? (y/n): ");
+                String filterByMonth = sc.nextLine().trim().toLowerCase();
+
+                while (!filterByMonth.equals("y") && !filterByMonth.equals("n")) {
+                    System.out.println("\tERROR: Please enter 'y' for yes or 'n' for no.");
+                    System.out.print("Do you want to filter by Month? (y/n): ");
+                    filterByMonth = sc.nextLine().trim().toLowerCase();
+                }
+
+                if (filterByMonth.equals("y")) {
+                    month = validateMonthInput(sc);
+                    if (month.equalsIgnoreCase("EXIT")) {
+                        
                         return;
                     }
-
-                    query += "WHERE e.emp_dept = ? "; 
-
-                    System.out.print("Do you want to filter by Month? (y/n): ");
-                    String filterByMonth = sc.nextLine().trim().toLowerCase();
-
-          
-                    while (!filterByMonth.equals("y") && !filterByMonth.equals("n")) {
-                        System.out.println("\tERROR: Please enter 'y' for yes or 'n' for no.");
-                        System.out.print("Do you want to filter by Month? (y/n): ");
-                        filterByMonth = sc.nextLine().trim().toLowerCase();
-                    }
-
-                    if (filterByMonth.equals("y")) {
-                        month = validateMonthInput(sc);
-                        if (month.equalsIgnoreCase("EXIT")) { 
-                            System.out.println("\tProcess Canceled!");
-                            return;
-                        }
-
-                    
-                        query += "AND r.month = ? ";
-                    } else {
-                        System.out.println("No month filter applied.");
-                    }
-
+                    query += "AND r.month = ? ";
+                } else {
+                    System.out.println("No month filter applied.");
+                }
+                break;
 
             case 4:
-                
                 break;
 
             case 5:
-                
                 System.out.println("\tReturning to the main menu...");
                 return;
 
@@ -278,26 +270,37 @@ import java.util.Set;
                 System.out.println("\tInvalid choice. Returning to the main menu...");
                 return;
         }
-
+        
+        System.out.println("\n");
+        
         query += "ORDER BY r.date_generated DESC";
 
         try (Connection con = connectDB();
              PreparedStatement pst = con.prepareStatement(query)) {
-             
-           
+
             int paramIndex = 1;
-            int empId = 0;
+
             if (choice == 1) pst.setInt(paramIndex++, empId);
-            if (choice == 2 || choice == 3) pst.setString(paramIndex++, month);
-            String dept = null;
+            if (choice == 2 || (choice == 3 && month != null)) pst.setString(paramIndex++, month); 
             if (choice == 3) pst.setString(paramIndex++, dept);
 
             try (ResultSet rs = pst.executeQuery()) {
-                System.out.println("\n\n");
-                System.out.println("****************************************************");
-                System.out.println("             LIST OF GENERATED REPORTS              ");
-                System.out.println("****************************************************");
-                System.out.println(" REPORT ID | EMP ID  |           NAME            |            DEPARTMENT           |   MONTH   |   STATUS  |   NET PAY   | DATE GENERATED ");
+                String tableHeader = " REPORT ID | EMP ID  |           NAME            |            DEPARTMENT           |   MONTH   |   STATUS  |   NET PAY   | DATE GENERATED ";
+                int tableWidth = tableHeader.length();
+
+               
+                StringBuilder asterisks = new StringBuilder();
+                for (int i = 0; i < tableWidth; i++) {
+                    asterisks.append("*");
+                }
+
+             
+                System.out.println(asterisks.toString());
+                System.out.println(String.format("%" + (tableWidth / 2 + 10) + "s", "LIST OF GENERATED REPORTS"));
+                System.out.println(asterisks.toString());
+
+             
+                System.out.println(tableHeader);
                 System.out.println("-----------|---------|---------------------------|---------------------------------|-----------|-----------|-------------|----------------");
 
                 boolean hasResults = false;
@@ -318,7 +321,8 @@ import java.util.Set;
                     System.out.println("\tNo reports found for the selected filters.");
                 }
 
-                System.out.println("****************************************************");
+                
+                System.out.println(asterisks.toString());
             }
         }
 
@@ -326,6 +330,8 @@ import java.util.Set;
         System.out.println("Error retrieving reports: " + e.getMessage());
     }
 }
+
+
 
     
     public double getSingleValue(String sql, Object... params) {
@@ -453,8 +459,7 @@ public void generateReport(Connection con) throws SQLException {
     Scanner sc = new Scanner(System.in);
     validation val = new validation();
 
-    System.out.print("Enter Employee ID: ");
-    String idInput = sc.nextLine();
+    System.out.print("Enter Employee ID (or press 'X' to cancel): ");
     int id = val.validateInt();
 
              if (id == -1) {
@@ -733,7 +738,7 @@ public void generateReport(Connection con) throws SQLException {
                     default:
                         
                          System.out.println("Invalid Selection!");
-                         System.out.println("Going Back to the Main Menu . . .");
+                         
                          
                 }
 
@@ -741,10 +746,6 @@ public void generateReport(Connection con) throws SQLException {
             } while (!selected);
 
 
-            try {
-                con.close();
-            } catch (SQLException e) {
-                System.out.println("Failed to close the connection: " + e.getMessage());
-            }
+            
         }
     }

@@ -37,6 +37,11 @@ public void importDataToDatabase(String csvFilePath) {
     String insertQuery = "INSERT INTO DailyTimeRecords (employee_id, entry_date, time_in, time_out, month, hours_worked, overtime_hrs, absent) " +
                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
+    int totalRecords = 0;
+    int successfulImports = 0;
+    int duplicateRecords = 0;
+    int invalidRecords = 0;
+
     try (Connection conn = config.connectDB()) {
         conn.setAutoCommit(false);
 
@@ -48,10 +53,11 @@ public void importDataToDatabase(String csvFilePath) {
             br.readLine(); 
 
             while ((line = br.readLine()) != null) {
+                totalRecords++;
                 String[] record = line.split(",");
 
                 if (record.length != 8) {
-                    System.out.println("Skipping invalid record: " + line);
+                    invalidRecords++;
                     continue;
                 }
 
@@ -65,14 +71,14 @@ public void importDataToDatabase(String csvFilePath) {
                     int overtimeHrs = Integer.parseInt(record[6].trim());
                     String absent = record[7].trim();
 
-                 
+                   
                     selectStmt.setInt(1, empId);
                     selectStmt.setString(2, entryDate);
 
                     try (ResultSet rs = selectStmt.executeQuery()) {
                         rs.next();
                         if (rs.getInt(1) > 0) {
-                            System.out.println("Skipping existing record for employee ID: " + empId + " on date: " + entryDate);
+                            duplicateRecords++;
                             continue;
                         }
                     }
@@ -88,15 +94,19 @@ public void importDataToDatabase(String csvFilePath) {
                     insertStmt.setString(8, absent);
 
                     insertStmt.executeUpdate();
-                    System.out.println("Inserted new record for employee ID: " + empId + " on the month: " + month);
-
+                    successfulImports++;
                 } catch (Exception e) {
-                    System.out.println("Error in record processing: " + line + " | Error: " + e.getMessage());
+                    invalidRecords++;
                 }
             }
 
             conn.commit();
-            System.out.println("DailyTimeRecord.csv data import completed successfully!");
+            System.out.println("\nData import completed successfully!");
+            System.out.println("Summary:");
+            System.out.println("\tTotal records processed: " + totalRecords);
+            System.out.println("\tSuccessful imports: " + successfulImports);
+            System.out.println("\tDuplicate records skipped: " + duplicateRecords);
+            System.out.println("\tInvalid records skipped: " + invalidRecords);
 
         } catch (Exception e) {
             conn.rollback();
@@ -106,6 +116,7 @@ public void importDataToDatabase(String csvFilePath) {
         System.out.println("Database connection error: " + e.getMessage());
     }
 }
+
 
 
 private String formatDate(String csvDate) throws Exception {
