@@ -80,7 +80,7 @@ public class validation {
 
      public String validateGender() {
     while (true) {
-        System.out.print("Enter gender (M/F or 'X' to cancel): ");
+        
         String input = sc.nextLine().trim().toUpperCase();
         if ("X".equals(input)) return "EXIT";
         if (input.equals("M") || input.equals("F")) return input; 
@@ -91,14 +91,14 @@ public class validation {
      
      public int validateAge() {
     while (true) {
-        System.out.print("Enter age (or -1 to cancel): ");
+       
         try {
             int age = Integer.parseInt(sc.nextLine().trim());
             if (age == -1) return -1;
             if (age >= 18 && age <= 65) return age; // Adjust range as needed
-            System.out.println("Age must be between 18 and 65.");
+            System.out.print("Age must be between 18 and 65: ");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
+            System.out.println("Invalid input. Please enter a valid number: ");
         }
     }
 }
@@ -421,7 +421,7 @@ public int Rate() {
     int rate = 0;
     
     while (true) {
-        System.out.print("\tPlease enter the hourly rate (or enter 'X' to cancel): ");
+        System.out.print("Please enter the hourly rate (or enter 'X' to cancel): ");
         
         String input = sc.nextLine().trim();  
         

@@ -116,10 +116,10 @@ public class employees {
         int rate = val.Rate();
         if (rate == -1) return;
         
-        String sql = "INSERT INTO tbl_employees (emp_fname, emp_lname, emp_add, emp_email, emp_contactnum, emp_hdate, emp_dept, emp_position, emp_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tbl_employees (emp_fname, emp_lname, age, gender, emp_add, emp_email, emp_contactnum, emp_hdate, emp_dept, emp_position, emp_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
-        conf.addRecord(sql, fname, lname, addrss, email, num, hdate, dept, pos, rate);
+        conf.addRecord(sql, fname, lname, age, gender, addrss, email, num, hdate, dept, pos, rate);
 
 
     }
@@ -128,8 +128,8 @@ public class employees {
         config cfg = new config();
         
         String emp_dtls = "select * from tbl_employees";
-        String[] emp_hdrs = {"ID", "FIRST NAME", "LAST NAME", "ADDRESS", "EMAIL", "CONTACT #", "HIRE DATE", "Department", "Position", "Rate"};
-         String[] emp_clmn = {"emp_id", "emp_fname", "emp_lname", "emp_add", "emp_email", "emp_contactnum", "emp_hdate", "emp_dept", "emp_position", "emp_rate"};
+        String[] emp_hdrs = {"ID", "FIRST NAME", "LAST NAME", "AGE", "GENDER", "ADDRESS", "EMAIL", "CONTACT #", "HIRE DATE", "Department", "Position", "Rate"};
+         String[] emp_clmn = {"emp_id", "emp_fname", "emp_lname", "age", "gender", "emp_add", "emp_email", "emp_contactnum", "emp_hdate", "emp_dept", "emp_position", "emp_rate"};
         cfg.viewRecords(emp_dtls, emp_hdrs, emp_clmn);
         
     }

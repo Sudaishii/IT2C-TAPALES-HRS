@@ -652,7 +652,7 @@ public void generateReport(Connection con) throws SQLException {
             }
 
 
-            while (getSingleValue("SELECT emp_id FROM tbl_employees WHERE emp_id = ?", id) == 0) {
+            while (getSingleValue("SELECT report_id FROM Reports WHERE report_id = ?", id) == 0) {
                 System.out.print("\tERROR: ID doesn't exist, try again (or press 'X' to cancel): ");
                 id = val.validateInt();
                 if (id == -1) {
